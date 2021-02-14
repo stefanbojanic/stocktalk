@@ -1,0 +1,11 @@
+{
+  "name": "stocktalk",
+  "version": "1.0.0",
+  "main": "server.js",
+  "repository": "https://github.com/stefanbojanic/stocktalk.git",
+  "author": "<ianmmah@gmail.com>",
+  "license": "secret",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
