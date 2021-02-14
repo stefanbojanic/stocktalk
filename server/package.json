@@ -6,6 +6,8 @@
   "author": "<ianmmah@gmail.com>",
   "license": "secret",
   "dependencies": {
-    "express": "^4.17.1"
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "snoowrap": "^1.22.0"
   }
 }
