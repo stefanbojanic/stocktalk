@@ -1,3 +1,5 @@
+const { allowList } = require('./constants')
+
 const getTickers = (text) => {
     const filtered = text.replace(/[^a-zA-Z ]/g, '')
     const words = filtered.split(' ')
@@ -6,10 +8,7 @@ const getTickers = (text) => {
 
 // TODO: Check yahoo finance api
 const verifyTicker = (word) => {
-    const allowlist = {
-        "GME": true
-    };
-    return allowlist[word]
+    return allowList[word]
 }
 
 module.exports = {

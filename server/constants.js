@@ -3,7 +3,7 @@ module.exports = {
     INVESTING: "investing",
     STOCKS: "stocks",
     subreddits: [],
-    denylist: [
+    denyList: [
         "YOLO", "TOS", "CEO", "CFO", "CTO", "DD", "BTFD", "WSB", "OK", "RH",
         "KYS", "FD", "TYS", "US", "USA", "IT", "ATH", "RIP", "BMW", "GDP",
         "OTM", "ATM", "ITM", "IMO", "LOL", "DOJ", "BE", "PR", "PC", "ICE",
@@ -15,5 +15,13 @@ module.exports = {
         "SEP", "SEPT", "OCT", "NOV", "DEC", "FDA", "IV", "ER", "IPO", "RISE",
         "IPA", "URL", "MILF", "BUT", "SSN", "FIFA", "USD", "CPU", "AT",
         "GG", "ELON"
-    ]
+    ],
+    allowList: { // Temp
+        'GME': 1,
+        'AMC': 1,
+        'BB': 1,
+        'BBBY': 1,
+        'SPY': 1,
+        'BB.TO': 1,
+    }
 }
