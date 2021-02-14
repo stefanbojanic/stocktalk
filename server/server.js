@@ -31,19 +31,27 @@ app.get('/raw', async (req, res) => {
 })
 
 app.get('/hot', async (req, res) => {
-  const posts = await r.getSubreddit(SUBREDDIT)
+  const counts = {}
+  await r.getSubreddit(SUBREDDIT)
     .getHot()
-    .map(post => ({
-      title: post.title,
-      content: getTickers(post.selftext),
-      flair: post.link_flair_richtext[0].t,
-      upvoteRatio: post.upvote_ratio,
-      upvotes: post.ups,
-    }))
+    .map(post => {
+      const tickers = { ...getTickers(post.title), ...getTickers(post.selftext)}
+      Object.keys(tickers).forEach(ticker => {
+        if(counts[ticker]) {
+          counts[ticker].count += 1
+          counts[ticker].upvotes += post.ups
+        } else {
+          counts[ticker] = {
+            count: 1,
+            upvotes: post.ups
+          }
+        }
+      })
+    })
   // url, approved_at_utc, subreddit, selftext, aiuthor_fullname, saved, mod_reason_title, gilded, clicked, title,
   // link_flair_richtext{ e:text, t:weekend discussion}, subredit_name_prefixed, link_flair_css_class, link_flair_text
 
-  res.send(posts)
+  res.send(counts)
 })
 
 app.listen(port, () => {
