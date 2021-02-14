@@ -4,8 +4,7 @@ const getTickers = (text) => {
     return words.filter(word => word.length <= 5 && verifyTicker(word))
 }
 
-
-// TODO: Check yahoo finance api? 
+// TODO: Check yahoo finance api
 const verifyTicker = (word) => {
     const allowlist = {
         "GME": true
@@ -16,6 +15,3 @@ const verifyTicker = (word) => {
 module.exports = {
     getTickers
 }
-
-
-// 6043672733 - jerrys number

@@ -17,16 +17,12 @@ const r = new snoowrap({
   password: 'PoonaniPrince69'
 });
 
-
-// setup 
 const SUBREDDIT = constants.WALLSTREETBETS
+
+
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
-
-// app.get('/tickers', async (req, res) => {
-
-// })
 
 app.get('/raw', async (req, res) => {
   const content = await r.getSubreddit(SUBREDDIT)
@@ -35,8 +31,7 @@ app.get('/raw', async (req, res) => {
 })
 
 app.get('/hot', async (req, res) => {
-  // gets hot posts on subreddit - chaining-tatum
-  const hotTitles = await r.getSubreddit(SUBREDDIT)
+  const posts = await r.getSubreddit(SUBREDDIT)
     .getHot()
     .map(post => ({
       title: post.title,
@@ -46,13 +41,11 @@ app.get('/hot', async (req, res) => {
       upvotes: post.ups,
     }))
   // url, approved_at_utc, subreddit, selftext, aiuthor_fullname, saved, mod_reason_title, gilded, clicked, title,
-  // link_flair_richtext{ e:text, t:weekend discussion}, subredit_name_prefixed, link_flair_css_class, link_flair_text, 
-  // ric_flair_text_go_woo_on_a_bih
+  // link_flair_richtext{ e:text, t:weekend discussion}, subredit_name_prefixed, link_flair_css_class, link_flair_text
 
-  res.send(hotTitles)
+  res.send(posts)
 })
 
-
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`App listening at http://localhost:${port}`)
 })
