@@ -7,6 +7,8 @@ const {
   updateTickers
 } = require('./utils');
 
+const db = require('./firestore');
+
 const app = express()
 const port = 3000
 
@@ -20,9 +22,14 @@ const r = new snoowrap({
 
 const SUBREDDIT = constants.WALLSTREETBETS
 
-
 app.get('/', (req, res) => {
   res.send('Hello World!')
+})
+
+app.get('/write/:word', async (req, res) => {
+  const { word } = req.params
+  await db.collection('test').doc('exampleId').set({word})
+  res.send(`Wrote ${word} to database`)
 })
 
 app.get('/raw', async (req, res) => {
