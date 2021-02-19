@@ -8,6 +8,8 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "firebase-admin": "^9.5.0",
+    "moment": "^2.29.1",
     "snoowrap": "^1.22.0"
   }
 }
