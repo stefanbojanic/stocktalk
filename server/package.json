@@ -11,12 +11,12 @@
     "snoowrap": "^1.22.0"
   },
   "scripts": {
-    "server": "nodemon ./server/server.js"
+    "start": "nodemon ./server/server.js"
   },
   "nodemonConfig": {
     "delay": "3"
   },
-  
+
   "devDependencies": {
     "nodemon": "^2.0.7"
   }
