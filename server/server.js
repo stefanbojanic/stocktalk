@@ -31,14 +31,21 @@ app.get('/raw', async (req, res) => {
   res.send(content)
 })
 
+app.get('/test', async (req, res) => {
+  const tickers = await getTickers("GME YOLO ASDIHHH BB ASDF PLTR")
+  res.send(tickers)
+})
+
 app.get('/hot', async (req, res) => {
   let counts = {}
   await r.getSubreddit(SUBREDDIT)
     .getHot()
-    .map(post => {
+    .map(async post => {
+      const titleTickers = await getTickers(post.title)
+      const postTickers = await getTickers(post.selftext)
       const tickers = {
-        ...getTickers(post.title),
-        ...getTickers(post.selftext)
+        ...titleTickers,
+        ...postTickers
       }
       counts = updateTickers(tickers, counts, post);
     });

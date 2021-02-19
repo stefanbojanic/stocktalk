@@ -1,16 +1,31 @@
 const {
-    allowList
+    API_KEY,
+    allowList,
+    denyList,
 } = require('./constants')
 
-const getTickers = (text) => {
+const httpRequest = require('./http');
+
+const getTickers = async (text) => {
     const filtered = text.replace(/[^a-zA-Z ]/g, '')
-    const words = filtered.split(' ')
+    let words = filtered.split(" ")
+    words = words.filter(word => word.length < 5)
+
     const tickers = {}
-    words.forEach(word => {
-        if (word.length <= 5 && verifyTicker(word)) {
-            tickers[word] = true
-        }
+
+    const checkWords = words.map(word => {
+        return checkTicker(word)
     })
+
+    await Promise.all(checkWords).then(res => {
+        console.log(res)
+        res.forEach(ticker => {
+            if (ticker){
+                tickers[ticker] = true
+            }
+        })
+    })
+    
     return tickers
 }
 
@@ -29,10 +44,35 @@ const updateTickers = (tickers, counts, post) => {
     return counts;
 }
 
-// TODO: Check yahoo finance api
-const verifyTicker = (word) => {
-    return allowList[word]
+const checkTicker = (word) => {
+    return new Promise((resolve, reject) => {
+        if (allowList[word]) {
+            return resolve(word)
+        }
+    
+        if (denyList[word]) {
+            return resolve(false)
+        }
+    
+        const params = {
+            hostname: 'www.alphavantage.co',
+            port: 443,
+            method: 'GET',
+            path: '/query?function=OVERVIEW&symbol=' + word + '&apikey=' + API_KEY
+        }
+    
+        return httpRequest(params).then(function(data) {
+            const isTicker = !!data.Symbol
+            if (isTicker === false) {
+                console.log(data)
+                resolve(false)
+            }
+            return resolve(word)
+        });
+
+    })
 }
+
 
 module.exports = {
     getTickers,
