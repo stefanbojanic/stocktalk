@@ -41,12 +41,7 @@ app.get('/hot', async (req, res) => {
   await r.getSubreddit(SUBREDDIT)
     .getHot()
     .map(async post => {
-      const titleTickers = await getTickers(post.title)
-      const postTickers = await getTickers(post.selftext)
-      const tickers = {
-        ...titleTickers,
-        ...postTickers
-      }
+      const tickers = await getTickers(post.title + post.selftext)
       counts = updateTickers(tickers, counts, post);
     });
   // url, approved_at_utc, subreddit, selftext, aiuthor_fullname, saved, mod_reason_title, gilded, clicked, title,

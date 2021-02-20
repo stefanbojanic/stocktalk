@@ -10,8 +10,12 @@ const httpRequest = require('./http');
 
 const getTickers = async (text) => {
     const filtered = text.replace(/[^a-zA-Z ]/g, '')
-    let words = filtered.split(" ")
-    words = words.filter(word => word.length < 5)
+    const words = filtered.split(" ")
+
+    // Remove duplicates
+    const uniqueWords = [...new Set(words)]
+    // Remove longer words
+    const filteredWords = uniqueWords.filter(word => word.length < 5)
 
     const tickers = {}
     const denyTickers = {}
@@ -19,7 +23,7 @@ const getTickers = async (text) => {
     const allowList = getAllowList()
     const denyList = getDenyList() 
 
-    const checkWords = words.map(word => {
+    const checkWords = filteredWords.map(word => {
         return checkTicker(allowList, denyList, word.toUpperCase())
     })
 
