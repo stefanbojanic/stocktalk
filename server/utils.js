@@ -1,9 +1,11 @@
 const {
     API_KEY,
-    allowList,
-    denyList,
 } = require('./constants')
-
+const {
+    getAllowList,
+    getDenyList,
+    updateList
+} = require('./db')
 const httpRequest = require('./http');
 
 const getTickers = async (text) => {
@@ -12,19 +14,32 @@ const getTickers = async (text) => {
     words = words.filter(word => word.length < 5)
 
     const tickers = {}
+    const denyTickers = {}
+        
+    const allowList = getAllowList()
+    const denyList = getDenyList() 
 
     const checkWords = words.map(word => {
-        return checkTicker(word)
+        return checkTicker(allowList, denyList, word.toUpperCase())
     })
 
     await Promise.all(checkWords).then(res => {
         console.log(res)
         res.forEach(ticker => {
-            if (ticker){
+            if (ticker === 'limited') {
+                // idk do nothing because we want to process it again later when we arent limited
+            }
+            else if (ticker === false) {
+                denyTickers[ticker] = true
+            }
+            else if (ticker !== 'limited'){
                 tickers[ticker] = true
             }
         })
     })
+
+    updateList('denyList', denyTickers)
+    updateList('allowList', tickers)
     
     return tickers
 }
@@ -44,8 +59,9 @@ const updateTickers = (tickers, counts, post) => {
     return counts;
 }
 
-const checkTicker = (word) => {
+const checkTicker = (allowList, denyList, word) => {
     return new Promise((resolve, reject) => {
+
         if (allowList[word]) {
             return resolve(word)
         }
@@ -64,8 +80,13 @@ const checkTicker = (word) => {
         return httpRequest(params).then(function(data) {
             const isTicker = !!data.Symbol
             if (isTicker === false) {
-                console.log(data)
-                resolve(false)
+                if (data.Note?.includes('Our standard API call frequency is 5 calls per minute and 500 calls per day')) {
+                    console.log(word, 'Api limit reached')
+                    resolve('limited')
+                } else {
+                    console.log(word, 'Ticker not found')
+                    resolve(false)
+                }
             }
             return resolve(word)
         });

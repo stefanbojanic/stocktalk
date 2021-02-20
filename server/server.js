@@ -32,7 +32,7 @@ app.get('/raw', async (req, res) => {
 })
 
 app.get('/test', async (req, res) => {
-  const tickers = await getTickers("GME YOLO ASDIHHH BB ASDF PLTR")
+  const tickers = await getTickers("GME FAKE YOLO ASDIHHH BB ASDF PLTR AMC CGX")
   res.send(tickers)
 })
 
