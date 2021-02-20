@@ -24,15 +24,14 @@ const getTickers = async (text) => {
     })
 
     await Promise.all(checkWords).then(res => {
-        console.log(res)
-        res.forEach(ticker => {
-            if (ticker === 'limited') {
+        res.forEach(({ticker, status}) => {
+            if (status === 'limited') {
                 // idk do nothing because we want to process it again later when we arent limited
             }
-            else if (ticker === false) {
+            else if (status === 'deny') {
                 denyTickers[ticker] = true
             }
-            else if (ticker !== 'limited'){
+            else if (status === 'allow'){
                 tickers[ticker] = true
             }
         })
@@ -63,11 +62,11 @@ const checkTicker = (allowList, denyList, word) => {
     return new Promise((resolve, reject) => {
 
         if (allowList[word]) {
-            return resolve(word)
+            return resolve({ticker: word, status: 'allow'})
         }
     
         if (denyList[word]) {
-            return resolve(false)
+            return resolve({ticker: word, status: 'deny'})
         }
     
         const params = {
@@ -82,13 +81,13 @@ const checkTicker = (allowList, denyList, word) => {
             if (isTicker === false) {
                 if (data.Note?.includes('Our standard API call frequency is 5 calls per minute and 500 calls per day')) {
                     console.log(word, 'Api limit reached')
-                    resolve('limited')
+                    resolve({ticker: word, status: 'limited'})
                 } else {
                     console.log(word, 'Ticker not found')
-                    resolve(false)
+                    resolve({ticker: word, status: 'deny'})
                 }
             }
-            return resolve(word)
+            return resolve({ticker: word, status: 'allow'})
         });
 
     })
