@@ -33,15 +33,17 @@ app.get('/raw', async (req, res) => {
   res.send(content)
 })
 
+app.get('/test', async (req, res) => {
+  const tickers = await getTickers("GME FAKE YOLO ASDIHHH BB ASDF PLTR AMC CGX")
+  res.send(tickers)
+})
+
 app.get('/hot', async (req, res) => {
   let counts = {}
   await r.getSubreddit(SUBREDDIT)
     .getHot()
-    .map(post => {
-      const tickers = {
-        ...getTickers(post.title),
-        ...getTickers(post.selftext)
-      }
+    .map(async post => {
+      const tickers = await getTickers(post.title + post.selftext)
       counts = updateTickers(tickers, counts, post);
     });
   // url, approved_at_utc, subreddit, selftext, aiuthor_fullname, saved, mod_reason_title, gilded, clicked, title,
