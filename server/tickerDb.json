@@ -18,7 +18,9 @@
         "FRTA": true,
         "FCEL": true,
         "IDEX": true,
-        "HGEN": true
+        "HGEN": true,
+        "UK": true,
+        "HILL": true
     },
     "denyList": {
         "ERIC": true,
@@ -254,6 +256,11 @@
         "HYPE": true,
         "SIGN": true,
         "HERE": true,
-        "LTD": true
+        "LTD": true,
+        "BAN": true,
+        "HOW": true,
+        "SURE": true,
+        "YEP": true,
+        "HIS": true
     }
 }
