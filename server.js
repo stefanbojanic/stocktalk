@@ -31,8 +31,18 @@ const r = new snoowrap({
 const SUBREDDIT = constants.WALLSTREETBETS
 
 app.get('/', async (req, res) => {
-  const date = moment().startOf('day').valueOf()
+  res.send('Hello World!')
+})
+
+app.get('/hot/:time', async (req, res) => {
+  const time = req.params.time
+  const date = time === 'today' ? moment().startOf('day').valueOf() : time
   const snapshot = await db.collection('counts').doc(`${date}`).get()
+
+  if (!snapshot.exists) {
+    res.send('No data for the selected timeframe')
+  }
+
   const tickers = Object.entries(snapshot.data()).map(([ticker, values]) => {
       return {
         ...values,
@@ -44,6 +54,7 @@ app.get('/', async (req, res) => {
         }
       }
   })
+
   tickers.sort((x, y) => {
     if (x.upvotes < y.upvotes) {
       return 1;
@@ -53,6 +64,7 @@ app.get('/', async (req, res) => {
     }
     return 0;
   })
+
   const view = {
     tickers,
     toFixed: function() {
@@ -61,6 +73,7 @@ app.get('/', async (req, res) => {
       }
     }
   }
+
   res.render('hot', view)
 })
 
