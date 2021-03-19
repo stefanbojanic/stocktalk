@@ -22,7 +22,7 @@ const r = new snoowrap({
   password: 'PoonaniPrince69'
 });
 
-const SUBREDDIT = "wallstreetbets"
+const SUBREDDIT = constants.WALLSTREETBETS
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
