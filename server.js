@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express');
 const snoowrap = require('snoowrap');
 const moment = require('moment');
+let mustacheExpress = require('mustache-express');
 const constants = require('./constants');
 const {
   getTickers,
@@ -12,6 +13,10 @@ const vader = require('vader-sentiment');
 const db = require('./firestore');
 
 const app = express()
+app.engine('html', mustacheExpress());
+app.set('view engine', 'html');
+app.set('views', __dirname + '/views');
+
 const port = 3000
 
 const r = new snoowrap({
@@ -25,7 +30,7 @@ const r = new snoowrap({
 const SUBREDDIT = constants.WALLSTREETBETS
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.render('hot', {name: 'Doug'})
 })
 
 app.get('/raw', async (req, res) => {
@@ -36,12 +41,11 @@ app.get('/raw', async (req, res) => {
 })
 
 app.get('/test', async (req, res) => {
-  // const tickers = await getTickers("GME FAKE YOLO ASDIHHH BB ASDF PLTR AMC CGX")
   const tickers = await getTickers("Has $GLD/IAU bottomed yet? What's the prospect for gold miners like $nugt?")
   res.send(tickers)
 })
 
-app.get('/hot', async (req, res) => {
+app.get('/genhot', async (req, res) => {
   console.log("REQUEST: /hot")
   let counts = {}
   const content = await r.getHot(SUBREDDIT, { limit: 100 } )
