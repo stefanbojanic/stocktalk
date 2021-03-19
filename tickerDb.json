@@ -65,8 +65,6 @@
         "BLUE": true,
         "PSN": true,
         "IBM": true,
-        "HOME": true,
-        "INDEX": true,
         "XHB": true,
         "III": true,
         "CPER": true,
@@ -95,9 +93,16 @@
         "SP": true,
         "CCIV": true,
         "MTG": true,
-        "HCMC": true
+        "HCMC": true,
+        "FB": true,
+        "TOUR": true,
+        "PENN": true,
+        "MU": true,
+        "QQQJ": true
     },
     "denyList": {
+        "HOME": true,
+        "INDEX": true,
         "RSI": true,
         "GAIN": true,
         "BBC": true,
@@ -736,6 +741,7 @@
         "ISN": true,
         "PTSD": true,
         "SPAC": true,
-        "TNX": true
+        "TNX": true,
+        "PROUD": true
     }
 }
