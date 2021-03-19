@@ -99,14 +99,14 @@ const checkTicker = (allowList, denyList, word) => {
             hostname: 'sandbox.iexapis.com', // use cloud.iexapis.com for real, sandbox.iexapis.com to test
             port: 443,
             method: 'GET',
-            path: '/stable/stock/' + word + '/quote?token=' + API_KEY
+            path: '/stable/stock/' + word + '/quote?token=' + API_KEY // API_KEY or PROD_KEY
         }
 
         console.log(params.path)
 
         return httpRequest(params)
         .then((data) => {
-            if (data.delayedPrice) {
+            if (data.latestPrice) {
                 console.log('Got ticker', word)
                 return resolve({ticker: word, status: 'allow'})
             } else {

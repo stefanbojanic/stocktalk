@@ -29,9 +29,10 @@ app.get('/', (req, res) => {
 })
 
 app.get('/raw', async (req, res) => {
-  const content = await r.getSubreddit(SUBREDDIT)
-    .getHot()
-  res.send(content)
+  const content = await r.getHot(SUBREDDIT, { limit: 100 } )
+  const all = await content.fetchMore({ amount: 400, append: true })
+  const text = all.map(post => post.selftext)
+  res.send(text)
 })
 
 app.get('/test', async (req, res) => {
@@ -41,9 +42,10 @@ app.get('/test', async (req, res) => {
 })
 
 app.get('/hot', async (req, res) => {
+  console.log("REQUEST: /hot")
   let counts = {}
-  await r.getSubreddit(SUBREDDIT)
-    .getHot()
+  const content = await r.getHot(SUBREDDIT, { limit: 100 } )
+  await content.fetchMore({ amount: 200, append: true })
     .map(async post => {
       const tickers = await getTickers(post.title + post.selftext)
       const sentiment = vader.SentimentIntensityAnalyzer.polarity_scores(post.title + post.selftext)   
@@ -54,7 +56,7 @@ app.get('/hot', async (req, res) => {
 
   const date = moment().startOf('day').valueOf()
   await db.collection('counts').doc(`${date}`).set(counts)
-  res.send(`Wrote "${JSON.stringify(counts)}" to database, key: "${date}"`)
+  res.send(counts)
 })
 
 app.listen(port, () => {
