@@ -5,7 +5,7 @@ const httpRequest = (params, postData) => {
         var req = https.request(params, function(res) {
             // reject on bad status
             if (res.statusCode < 200 || res.statusCode >= 300) {
-                return reject(new Error('statusCode=' + res.statusCode));
+                return reject({statusCode: res.statusCode});
             }
             // cumulate data
             var body = [];

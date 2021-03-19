@@ -5,7 +5,7 @@ const moment = require('moment');
 const constants = require('./constants');
 const {
   getTickers,
-  updateTickers
+  updateTickers,
 } = require('./utils');
 
 const db = require('./firestore');

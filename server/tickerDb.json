@@ -18,7 +18,10 @@
         "FRTA": true,
         "FCEL": true,
         "IDEX": true,
-        "HGEN": true
+        "HGEN": true,
+        "GLD": true,
+        "IAU": true,
+        "NUGT": true
     },
     "denyList": {
         "ERIC": true,

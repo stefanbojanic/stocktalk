@@ -75,33 +75,33 @@ const checkTicker = (allowList, denyList, word) => {
     return new Promise((resolve, reject) => {
 
         if (allowList[word]) {
+            console.log('Cache allow', word)
             return resolve({ticker: word, status: 'allow'})
         }
     
         if (denyList[word]) {
+            console.log('Cache deny', word)
             return resolve({ticker: word, status: 'deny'})
         }
     
         const params = {
-            hostname: 'www.alphavantage.co',
+            hostname: 'sandbox.iexapis.com', // use cloud.iexapis.com for real, sandbox to test
             port: 443,
             method: 'GET',
-            path: '/query?function=OVERVIEW&symbol=' + word + '&apikey=' + API_KEY
+            path: '/stable/stock/' + word + '/quote?token=' + API_KEY
         }
-    
-        return httpRequest(params).then(function(data) {
-            const isTicker = !!data.Symbol
-            if (isTicker === false) {
-                if (data.Note?.includes('Our standard API call frequency is 5 calls per minute and 500 calls per day')) {
-                    console.log(word, 'Api limit reached')
-                    resolve({ticker: word, status: 'limited'})
-                } else {
-                    console.log(word, 'Ticker not found')
-                    resolve({ticker: word, status: 'deny'})
-                }
-            }
+
+        return httpRequest(params)
+        .then((data) => {
+            console.log('Got ticker', word)
             return resolve({ticker: word, status: 'allow'})
-        });
+        })
+        .catch((e) => {
+            if (e.statusCode === 404) {
+                console.log('404 ticker', word)
+                return resolve({ticker: word, status: 'deny'})                
+            }
+        })
 
     })
 }
@@ -109,5 +109,5 @@ const checkTicker = (allowList, denyList, word) => {
 
 module.exports = {
     getTickers,
-    updateTickers
+    updateTickers,
 }
