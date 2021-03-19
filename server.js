@@ -11,10 +11,11 @@ const {
 } = require('./utils');
 const vader = require('vader-sentiment');
 const db = require('./firestore');
+const { values } = require('lodash');
 
 const app = express()
-app.engine('html', mustacheExpress());
-app.set('view engine', 'html');
+app.engine('mustache', mustacheExpress());
+app.set('view engine', 'mustache');
 app.set('views', __dirname + '/views');
 
 const port = 3000
@@ -29,8 +30,29 @@ const r = new snoowrap({
 
 const SUBREDDIT = constants.WALLSTREETBETS
 
-app.get('/', (req, res) => {
-  res.render('hot', {name: 'Doug'})
+app.get('/', async (req, res) => {
+  const date = moment().startOf('day').valueOf()
+  const snapshot = await db.collection('counts').doc(`${date}`).get()
+  const tickers = Object.entries(snapshot.data()).map(([ticker, values]) => {
+      return {
+        ...values,
+        ticker,
+        sentiment: {
+          pos: values.sentiment.pos / values.count * 100,
+          neg: values.sentiment.neg / values.count * 100,
+          neu: values.sentiment.neu / values.count * 100
+        }
+      }
+  })
+  const view = {
+    tickers,
+    toFixed: function() {
+      return function(num, render) {
+          return parseFloat(render(num)).toFixed(2);
+      }
+    }
+  }
+  res.render('hot', view)
 })
 
 app.get('/raw', async (req, res) => {

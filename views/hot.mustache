@@ -1,0 +1,56 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>Stocktalk - Hot Tickers</title>
+    <meta name="description" content="Stocktalk">
+    <meta name="author" content="Stocktalk">
+
+    <!-- <link rel="stylesheet" href="css/styles.css?v=1.0"> -->
+    <style>
+        table {
+        border-collapse: collapse;
+        min-width: 600px;
+        }
+        
+        td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+        }
+        
+        tr:nth-child(even) {
+        background-color: #dddddd;
+        }
+    </style>
+
+</head>
+
+<body>
+    Welcome to Stocktalk
+    <table>
+        <tr>
+            <th>Ticker</th>
+            <th>Posts</th>
+            <th>Upvotes</th>
+            <th>Bull</th>
+            <th>Neutral</th>
+            <th>Bear</th>
+        </tr>
+        {{#tickers}}
+            <tr>
+                <td>{{ticker}}</td>
+                <td>{{count}}</td>
+                <td>{{upvotes}}</td>
+                <td>{{#toFixed}}{{sentiment.pos}}{{/toFixed}}</td>
+                <td>{{#toFixed}}{{sentiment.neu}}{{/toFixed}}</td>
+                <td>{{#toFixed}}{{sentiment.neg}}{{/toFixed}}</td>
+            </tr>
+        {{/tickers}}
+    </table>
+      
+    <!-- <script src="js/scripts.js"></script> -->
+</body>
+</html>
