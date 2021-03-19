@@ -34,7 +34,8 @@ app.get('/raw', async (req, res) => {
 })
 
 app.get('/test', async (req, res) => {
-  const tickers = await getTickers("GME FAKE YOLO ASDIHHH BB ASDF PLTR AMC CGX")
+  // const tickers = await getTickers("GME FAKE YOLO ASDIHHH BB ASDF PLTR AMC CGX")
+  const tickers = await getTickers("Has $GLD/IAU bottomed yet? What's the prospect for gold miners like $nugt?")
   res.send(tickers)
 })
 

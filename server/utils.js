@@ -9,13 +9,22 @@ const {
 const httpRequest = require('./http');
 
 const getTickers = async (text) => {
-    const filtered = text.replace(/[^a-zA-Z ]/g, '')
-    const words = filtered.split(" ")
+    const posPrefix ="\\b(?<=\\$)"
+    const negPrefix = "\\b(?<!\\$)"    
+    const prefixUpper = new RegExp(posPrefix + "[A-Z]{1,6}", 'g')
+    const nofixUpper = new RegExp(negPrefix + "[A-Z]{2,6}", 'g')
+    const prefixLower = new RegExp(posPrefix + "[a-z]{1,6}", 'g')
+    const prefixTitle = new RegExp(posPrefix + "[A-Z]{1}[a-z]{2,5}", 'g')
+
+    const matches = [
+        ...(text.match(prefixUpper) || []),
+        ...(text.match(nofixUpper) || []),
+        ...(text.match(prefixLower) || []),
+        ...(text.match(prefixTitle) || []),
+    ]
 
     // Remove duplicates
-    const uniqueWords = [...new Set(words)]
-    // Remove longer words
-    const filteredWords = uniqueWords.filter(word => word.length < 5)
+    const uniqueWords = [...new Set(matches)]
 
     const tickers = {}
     const denyTickers = {}
@@ -23,7 +32,7 @@ const getTickers = async (text) => {
     const allowList = getAllowList()
     const denyList = getDenyList() 
 
-    const checkWords = filteredWords.map(word => {
+    const checkWords = uniqueWords.map(word => {
         return checkTicker(allowList, denyList, word.toUpperCase())
     })
 
