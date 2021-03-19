@@ -44,6 +44,15 @@ app.get('/', async (req, res) => {
         }
       }
   })
+  tickers.sort((x, y) => {
+    if (x.upvotes < y.upvotes) {
+      return 1;
+    }
+    if (x.upvotes > y.upvotes) {
+      return -1;
+    }
+    return 0;
+  })
   const view = {
     tickers,
     toFixed: function() {
