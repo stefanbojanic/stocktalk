@@ -6,8 +6,9 @@ const constants = require('./constants');
 const {
   getTickers,
   updateTickers,
+  analyzePost
 } = require('./utils');
-
+const vader = require('vader-sentiment');
 const db = require('./firestore');
 
 const app = express()
@@ -45,7 +46,8 @@ app.get('/hot', async (req, res) => {
     .getHot()
     .map(async post => {
       const tickers = await getTickers(post.title + post.selftext)
-      counts = updateTickers(tickers, counts, post);
+      const sentiment = vader.SentimentIntensityAnalyzer.polarity_scores(post.title + post.selftext)   
+      counts = updateTickers(tickers, counts, post, sentiment);
     });
   // url, approved_at_utc, subreddit, selftext, aiuthor_fullname, saved, mod_reason_title, gilded, clicked, title,
   // link_flair_richtext{ e:text, t:weekend discussion}, subredit_name_prefixed, link_flair_css_class, link_flair_text

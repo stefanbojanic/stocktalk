@@ -62,15 +62,20 @@ const getTickers = async (text) => {
     return tickers
 }
 
-const updateTickers = (tickers, counts, post) => {
+const updateTickers = (tickers, counts, post, sentiment) => {
     Object.keys(tickers).forEach(ticker => {
         if (counts[ticker]) {
             counts[ticker].count += 1
             counts[ticker].upvotes += post.ups
+            counts[ticker].sentiment.neg += sentiment.neg
+            counts[ticker].sentiment.neu += sentiment.neu
+            counts[ticker].sentiment.pos += sentiment.pos
         } else {
+            delete sentiment.compound
             counts[ticker] = {
                 count: 1,
-                upvotes: post.ups
+                upvotes: post.ups,
+                sentiment,
             }
         }
     });
