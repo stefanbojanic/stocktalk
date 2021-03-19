@@ -1,5 +1,6 @@
 const {
     API_KEY,
+    PROD_KEY,
 } = require('./constants')
 const {
     getAllowList,
@@ -8,13 +9,17 @@ const {
 } = require('./db')
 const httpRequest = require('./http');
 
+const sleep = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
 const getTickers = async (text) => {
     const posPrefix ="\\b(?<=\\$)"
     const negPrefix = "\\b(?<!\\$)"    
-    const prefixUpper = new RegExp(posPrefix + "[A-Z]{1,6}", 'g')
-    const nofixUpper = new RegExp(negPrefix + "[A-Z]{2,6}", 'g')
-    const prefixLower = new RegExp(posPrefix + "[a-z]{1,6}", 'g')
-    const prefixTitle = new RegExp(posPrefix + "[A-Z]{1}[a-z]{2,5}", 'g')
+    const prefixUpper = new RegExp(posPrefix + "[A-Z]{1,5}\\b", 'g')
+    const nofixUpper = new RegExp(negPrefix + "[A-Z]{2,5}\\b", 'g')
+    const prefixLower = new RegExp(posPrefix + "[a-z]{1,6}\\b", 'g')
+    const prefixTitle = new RegExp(posPrefix + "[A-Z]{1}[a-z]{2,5}\\b", 'g')
 
     const matches = [
         ...(text.match(prefixUpper) || []),
@@ -30,9 +35,10 @@ const getTickers = async (text) => {
     const denyTickers = {}
         
     const allowList = getAllowList()
-    const denyList = getDenyList() 
+    const denyList = getDenyList()
 
-    const checkWords = uniqueWords.map(word => {
+    const checkWords = uniqueWords.map(async word => {
+        await sleep(200);
         return checkTicker(allowList, denyList, word.toUpperCase())
     })
 
@@ -85,22 +91,34 @@ const checkTicker = (allowList, denyList, word) => {
         }
     
         const params = {
-            hostname: 'sandbox.iexapis.com', // use cloud.iexapis.com for real, sandbox to test
+            hostname: 'sandbox.iexapis.com', // use cloud.iexapis.com for real, sandbox.iexapis.com to test
             port: 443,
             method: 'GET',
             path: '/stable/stock/' + word + '/quote?token=' + API_KEY
         }
 
+        console.log(params.path)
+
         return httpRequest(params)
         .then((data) => {
-            console.log('Got ticker', word)
-            return resolve({ticker: word, status: 'allow'})
+            if (data.delayedPrice) {
+                console.log('Got ticker', word)
+                return resolve({ticker: word, status: 'allow'})
+            } else {
+                console.log('Ignored ticker', word)
+                return resolve({ticker: word, status: 'deny'})  
+            }
         })
         .catch((e) => {
             if (e.statusCode === 404) {
                 console.log('404 ticker', word)
                 return resolve({ticker: word, status: 'deny'})                
+            } else {
+                console.log('Error', e.statusCode, word)
             }
+        })
+        .finally(() => {
+            return resolve({ticker: word, status: 'limited'})  
         })
 
     })
