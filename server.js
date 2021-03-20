@@ -60,6 +60,7 @@ app.get('/hot', async (req, res) => {
 
   const view = {
     tickers,
+    date: moment(date).format('YYYY-MMM-D'),
     toFixed: function() {
       return function(num, render) {
           return parseFloat(render(num)).toFixed(2);
