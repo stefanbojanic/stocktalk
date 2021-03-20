@@ -12,7 +12,7 @@ app.engine('mustache', mustacheExpress());
 app.set('view engine', 'mustache');
 app.set('views', __dirname + '/views');
 
-const port = 3000
+const port = process.env.PORT || 3000
 
 app.get('/', async (req, res) => {
   res.render('home')
