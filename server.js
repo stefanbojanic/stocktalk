@@ -20,19 +20,18 @@ app.get('/', async (req, res) => {
 
 app.get('/hot', async (req, res) => {
   const date = req.query.date
-  const timestamp = moment(date).utc().valueOf()
+  const timestamp = moment(date).utc().startOf('day').valueOf()
 
-  console.log(moment(date).utc().valueOf())
   console.log(timestamp)
   console.log(req.query)
 
   let snapshot = await db.collection('counts').doc(`${timestamp}`).get()
 
-  if (!snapshot.exists && timestamp === moment().startOf('day').valueOf()) {
+  if (!snapshot.exists && timestamp === moment().utc().startOf('day').valueOf()) {
     // Trying to get todays data and its not there
     await getHot()
     snapshot = await db.collection('counts').doc(`${timestamp}`).get()
-  } else if (!snapshot.exists && timestamp !== moment().startOf('day').valueOf()) {
+  } else if (!snapshot.exists && timestamp !== moment().utc().startOf('day').valueOf()) {
     // Trying to get another days data and its not there
     res.send('No data for the selected timeframe')
     return
