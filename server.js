@@ -15,7 +15,57 @@ app.set('views', __dirname + '/views');
 const port = 3000
 
 app.get('/', async (req, res) => {
-  res.send('Hello World!')
+  res.render('home')
+})
+
+app.get('/hot', async (req, res) => {
+  const date = req.query.date
+  const timestamp = moment(date).valueOf()
+
+  let snapshot = await db.collection('counts').doc(`${timestamp}`).get()
+
+  if (!snapshot.exists && timestamp === moment().startOf('day').valueOf()) {
+    // Trying to get todays data and its not there
+    await getHot()
+    snapshot = await db.collection('counts').doc(`${timestamp}`).get()
+  } else if (!snapshot.exists && timestamp !== moment().startOf('day').valueOf()) {
+    // Trying to get another days data and its not there
+    res.send('No data for the selected timeframe')
+    return
+  }
+
+  const tickers = Object.entries(snapshot.data()).map(([ticker, values]) => {
+      return {
+        ...values,
+        ticker,
+        sentiment: {
+          pos: values.sentiment.pos / values.count * 100,
+          neg: values.sentiment.neg / values.count * 100,
+          neu: values.sentiment.neu / values.count * 100
+        }
+      }
+  })
+
+  tickers.sort((x, y) => {
+    if (x.upvotes < y.upvotes) {
+      return 1;
+    }
+    if (x.upvotes > y.upvotes) {
+      return -1;
+    }
+    return 0;
+  })
+
+  const view = {
+    tickers,
+    toFixed: function() {
+      return function(num, render) {
+          return parseFloat(render(num)).toFixed(2);
+      }
+    }
+  }
+
+  res.render('hot', view)
 })
 
 app.get('/hot/:time', async (req, res) => {
