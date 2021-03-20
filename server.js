@@ -22,6 +22,9 @@ app.get('/hot', async (req, res) => {
   const date = req.query.date
   const timestamp = moment(date).valueOf()
 
+  console.log(timestamp)
+  console.log(req.query)
+
   let snapshot = await db.collection('counts').doc(`${timestamp}`).get()
 
   if (!snapshot.exists && timestamp === moment().startOf('day').valueOf()) {
