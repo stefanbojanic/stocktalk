@@ -3,13 +3,14 @@ const {
     PROD_KEY,
 } = require('./constants')
 const snoowrap = require('snoowrap');
+const vader = require('vader-sentiment');
 const {
+    db,
     getAllowList,
     getDenyList,
-    updateList
-} = require('./db')
-const vader = require('vader-sentiment');
-const db = require('./firestore');
+    updateList,
+    saveLists
+} = require('./firestore');
 const moment = require('moment');
 const httpRequest = require('./http');
 const constants = require('./constants');
@@ -49,8 +50,8 @@ const getTickers = async (text) => {
     const tickers = {}
     const denyTickers = {}
         
-    const allowList = getAllowList()
-    const denyList = getDenyList()
+    const allowList = await getAllowList()
+    const denyList = await getDenyList()
 
     const checkWords = uniqueWords.map(async word => {
         await sleep(200);
@@ -71,8 +72,8 @@ const getTickers = async (text) => {
         })
     })
 
-    updateList('denyList', denyTickers)
-    updateList('allowList', tickers)
+    await updateList('denyList', denyTickers)
+    await updateList('allowList', tickers)
     
     return tickers
 }
@@ -148,9 +149,9 @@ const getHot = async () => {
   const date = moment().utc().startOf('day').valueOf()
   
   const snapshot = await db.collection('counts').doc(`${date}`).get()
-  if (snapshot.exists) {
-      return 'Data already set for this date'
-  }
+//   if (snapshot.exists) {
+//       return 'Data already set for this date'
+//   }
 
   let counts = {}
   const content = await r.getHot(SUBREDDIT, { limit: 100 } )
@@ -162,7 +163,7 @@ const getHot = async () => {
     });
   // url, approved_at_utc, subreddit, selftext, aiuthor_fullname, saved, mod_reason_title, gilded, clicked, title,
   // link_flair_richtext{ e:text, t:weekend discussion}, subredit_name_prefixed, link_flair_css_class, link_flair_text
-
+  await saveLists()
   await db.collection('counts').doc(`${date}`).set(counts)
   return counts
 }

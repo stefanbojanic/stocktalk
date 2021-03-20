@@ -5,7 +5,7 @@ let mustacheExpress = require('mustache-express');
 const {
   getHot
 } = require('./utils');
-const db = require('./firestore');
+const { db } = require('./firestore');
 
 const app = express()
 app.engine('mustache', mustacheExpress());
