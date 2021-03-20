@@ -2,7 +2,7 @@
 
 const { getHot } = require('./utils');
 
-const genhot = () => {
+const genhot = async () => {
     console.log("CRON: genhot")
     const counts = await getHot()
     res.send(counts)
