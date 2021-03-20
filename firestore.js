@@ -53,12 +53,18 @@ const updateList = (type, list) => {
 }
 
 const saveLists = async () => {
-  console.log('Saving caches', allowCache, denyCache)
+  console.log('Saving caches')
+
+  if(Object.values(allowCache).length >= 1) {
+    await db.collection('data').doc('allowList').update(allowCache)
+    allowCache = {}
+  }
+
+  if(Object.values(denyCache).length >= 1) {
+    await db.collection('data').doc('denyList').update(denyCache)
+    denyCache = {}
+  }
   
-  await db.collection('data').doc('allowList').update(allowCache)
-  allowCache = {}
-  await db.collection('data').doc('denyList').update(denyCache)
-  denyCache = {}
   
   console.log('Successfully saved caches', allowCache, denyCache)
 }

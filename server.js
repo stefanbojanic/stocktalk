@@ -36,13 +36,14 @@ app.get('/hot', async (req, res) => {
   }
   
   const tickers = Object.entries(snapshot.data()).map(([ticker, values]) => {
+    const count = parseInt(values.count)
       return {
         ...values,
         ticker,
         sentiment: {
-          pos: values.sentiment.pos / values.count * 100,
-          neg: values.sentiment.neg / values.count * 100,
-          neu: values.sentiment.neu / values.count * 100
+          pos: values.sentiment.pos / count * 100,
+          neg: values.sentiment.neg / count * 100,
+          neu: values.sentiment.neu / count * 100
         }
       }
   })
@@ -67,12 +68,6 @@ app.get('/hot', async (req, res) => {
   }
 
   res.render('hot', view)
-})
-
-app.get('/genhot', async (req, res) => {
-  console.log("REQUEST: /hot")
-  const counts = await getHot()
-  res.send(counts)
 })
 
 app.listen(port, () => {
