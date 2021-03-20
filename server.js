@@ -36,11 +36,7 @@ app.get('/hot', async (req, res) => {
     res.send('No data for the selected timeframe')
     return
   }
-
-  // 1616112000000
-  // 1616137200000
-  // 1616198400000
-
+  
   const tickers = Object.entries(snapshot.data()).map(([ticker, values]) => {
       return {
         ...values,
