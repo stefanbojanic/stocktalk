@@ -173,38 +173,6 @@ const getHot = async () => {
     return counts
 }
 
-const fakeHot = async () => {
-  
-  const posts = [{
-    title: 'yoink',
-    selftext: 'GME, GME TLRY to the moon lets go dudes $Nio',
-    ups: '123'
-},
-{
-    title: 'why I think GME moons',
-    selftext: 'short interest etc etc etc',
-    ups: '420'
-}]
-
-
-let counts = {}
-
-posts.map(async post => {
-      const tickers = await getTickers(`${post.title} ${post.selftext}`)
-      const sentiment = vader.SentimentIntensityAnalyzer.polarity_scores(post.title + post.selftext)   
-      const updatedTickers = await updateTickers(tickers, counts, post, sentiment);
-      console.log(updatedTickers)
-      counts = updatedTickers
-    });
-  // url, approved_at_utc, subreddit, selftext, aiuthor_fullname, saved, mod_reason_title, gilded, clicked, title,
-  // link_flair_richtext{ e:text, t:weekend discussion}, subredit_name_prefixed, link_flair_css_class, link_flair_text
-  await saveLists()
-  console.log('HYOOOOOO', counts)
-  return counts
-}
-
-
 module.exports = {
     getHot,
-    fakeHot
 }

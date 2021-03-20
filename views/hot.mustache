@@ -38,20 +38,20 @@
     <table>
         <tr>
             <th>Ticker</th>
-            <th>Posts</th>
             <th>Upvotes</th>
+            <th>Posts</th>
             <th>Bull</th>
-            <th>Neutral</th>
             <th>Bear</th>
+            <th>Neutral</th>
         </tr>
         {{#tickers}}
             <tr>
                 <td>{{ticker}}</td>
-                <td>{{count}}</td>
                 <td>{{upvotes}}</td>
-                <td>{{#toFixed}}{{sentiment.pos}}{{/toFixed}}</td>
-                <td>{{#toFixed}}{{sentiment.neu}}{{/toFixed}}</td>
-                <td>{{#toFixed}}{{sentiment.neg}}{{/toFixed}}</td>
+                <td>{{count}}</td>
+                <td>{{#toFixed}}{{sentiment.pos}}{{/toFixed}}%</td>
+                <td>{{#toFixed}}{{sentiment.neg}}{{/toFixed}}%</td>
+                <td>{{#toFixed}}{{sentiment.neu}}{{/toFixed}}%</td>
             </tr>
         {{/tickers}}
     </table>
