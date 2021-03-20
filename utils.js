@@ -2,16 +2,31 @@ const {
     API_KEY,
     PROD_KEY,
 } = require('./constants')
+const snoowrap = require('snoowrap');
 const {
     getAllowList,
     getDenyList,
     updateList
 } = require('./db')
+const vader = require('vader-sentiment');
+const db = require('./firestore');
+const moment = require('moment');
 const httpRequest = require('./http');
+const constants = require('./constants');
+
+const SUBREDDIT = constants.WALLSTREETBETS
 
 const sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }
+}
+
+const r = new snoowrap({
+    userAgent: 'wsb-tickerbot',
+    clientId: 'sXFsYdT2GlAZfQ',
+    clientSecret: 'LA1E5JRSVevmUYPPqYPLfWlviGXu8w',
+    username: 'wework-street-bets',
+    password: 'PoonaniPrince69'
+});
 
 const getTickers = async (text) => {
     const posPrefix ="\\b(?<=\\$)"
@@ -129,8 +144,30 @@ const checkTicker = (allowList, denyList, word) => {
     })
 }
 
+const getHot = async () => {
+  const date = moment().startOf('day').valueOf()
+  
+  const snapshot = await db.collection('counts').doc(`${date}`).get()
+  if (snapshot.exists) {
+      return 'Data already set for this date'
+  }
+
+  let counts = {}
+  const content = await r.getHot(SUBREDDIT, { limit: 100 } )
+  await content.fetchMore({ amount: 200, append: true })
+    .map(async post => {
+      const tickers = await getTickers(post.title + post.selftext)
+      const sentiment = vader.SentimentIntensityAnalyzer.polarity_scores(post.title + post.selftext)   
+      counts = updateTickers(tickers, counts, post, sentiment);
+    });
+  // url, approved_at_utc, subreddit, selftext, aiuthor_fullname, saved, mod_reason_title, gilded, clicked, title,
+  // link_flair_richtext{ e:text, t:weekend discussion}, subredit_name_prefixed, link_flair_css_class, link_flair_text
+
+  await db.collection('counts').doc(`${date}`).set(counts)
+  return counts
+}
+
 
 module.exports = {
-    getTickers,
-    updateTickers,
+    getHot,
 }

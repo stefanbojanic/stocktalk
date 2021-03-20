@@ -126,7 +126,16 @@
         "GE": true,
         "CFR": true,
         "BOOM": true,
-        "UPS": true
+        "UPS": true,
+        "SNDL": true,
+        "UPST": true,
+        "TDA": true,
+        "GMEI": true,
+        "ZOM": true,
+        "DAL": true,
+        "INTC": true,
+        "IQ": true,
+        "SQ": true
     },
     "denyList": {
         "HUGE": true,
@@ -797,6 +806,25 @@
         "AWS": true,
         "FME": true,
         "ASK": true,
-        "FULL": true
+        "FULL": true,
+        "GMT": true,
+        "CHIPS": true,
+        "ML": true,
+        "MOVED": true,
+        "WORKS": true,
+        "SPIKE": true,
+        "BD": true,
+        "RICO": true,
+        "TIMES": true,
+        "LP": true,
+        "HEY": true,
+        "BTFO": true,
+        "UTC": true,
+        "DI": true,
+        "UOA": true,
+        "FAQ": true,
+        "JIM": true,
+        "SLICK": true,
+        "BERH": true
     }
 }
