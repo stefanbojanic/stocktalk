@@ -1,10 +1,8 @@
 const { getHot } = require('./utils');
 
-const genhot = async () => {
+async function genhot() {
     console.log("CRON: genhot")
-    const counts = await getHot()
-}
+    await getHot()
+};
 
-genhot()
-
-process.exit()
+genhot();
