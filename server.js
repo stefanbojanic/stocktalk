@@ -20,8 +20,9 @@ app.get('/', async (req, res) => {
 
 app.get('/hot', async (req, res) => {
   const date = req.query.date
-  const timestamp = moment(date).valueOf()
+  const timestamp = moment(date).utc().valueOf()
 
+  console.log(moment(date).utc().valueOf())
   console.log(timestamp)
   console.log(req.query)
 
@@ -37,52 +38,9 @@ app.get('/hot', async (req, res) => {
     return
   }
 
-  const tickers = Object.entries(snapshot.data()).map(([ticker, values]) => {
-      return {
-        ...values,
-        ticker,
-        sentiment: {
-          pos: values.sentiment.pos / values.count * 100,
-          neg: values.sentiment.neg / values.count * 100,
-          neu: values.sentiment.neu / values.count * 100
-        }
-      }
-  })
-
-  tickers.sort((x, y) => {
-    if (x.upvotes < y.upvotes) {
-      return 1;
-    }
-    if (x.upvotes > y.upvotes) {
-      return -1;
-    }
-    return 0;
-  })
-
-  const view = {
-    tickers,
-    toFixed: function() {
-      return function(num, render) {
-          return parseFloat(render(num)).toFixed(2);
-      }
-    }
-  }
-
-  res.render('hot', view)
-})
-
-app.get('/hot/:time', async (req, res) => {
-  const time = req.params.time
-  const date = time === 'today' ? moment().startOf('day').valueOf() : time
-  const snapshot = await db.collection('counts').doc(`${date}`).get()
-
-  if (!snapshot.exists && time === 'today') {
-    await getHot()
-  }
-
-  if (!snapshot.exists) {
-    res.send('No data for the selected timeframe')
-  }
+  // 1616112000000
+  // 1616137200000
+  // 1616198400000
 
   const tickers = Object.entries(snapshot.data()).map(([ticker, values]) => {
       return {
@@ -117,18 +75,6 @@ app.get('/hot/:time', async (req, res) => {
 
   res.render('hot', view)
 })
-
-// app.get('/raw', async (req, res) => {
-//   const content = await r.getHot(SUBREDDIT, { limit: 100 } )
-//   const all = await content.fetchMore({ amount: 400, append: true })
-//   const text = all.map(post => post.selftext)
-//   res.send(text)
-// })
-
-// app.get('/test', async (req, res) => {
-//   const tickers = await getTickers("Has $GLD/IAU bottomed yet? What's the prospect for gold miners like $nugt?")
-//   res.send(tickers)
-// })
 
 app.get('/genhot', async (req, res) => {
   console.log("REQUEST: /hot")

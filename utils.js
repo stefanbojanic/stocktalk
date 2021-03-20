@@ -145,7 +145,7 @@ const checkTicker = (allowList, denyList, word) => {
 }
 
 const getHot = async () => {
-  const date = moment().startOf('day').valueOf()
+  const date = moment().utc().startOf('day').valueOf()
   
   const snapshot = await db.collection('counts').doc(`${date}`).get()
   if (snapshot.exists) {
