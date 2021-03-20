@@ -2,9 +2,7 @@ require('dotenv').config()
 const express = require('express');
 const moment = require('moment');
 let mustacheExpress = require('mustache-express');
-const {
-  getHot
-} = require('./utils');
+const { getHot } = require('./utils');
 const { db } = require('./firestore');
 
 const app = express()
