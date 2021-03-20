@@ -145,6 +145,13 @@ const checkTicker = (allowList, denyList, word) => {
 }
 
 const getHot = async () => {
+  const date = moment().startOf('day').valueOf()
+  
+  const snapshot = await db.collection('counts').doc(`${date}`).get()
+  if (snapshot.exists) {
+      return 'Data already set for this date'
+  }
+
   let counts = {}
   const content = await r.getHot(SUBREDDIT, { limit: 100 } )
   await content.fetchMore({ amount: 200, append: true })
@@ -156,7 +163,6 @@ const getHot = async () => {
   // url, approved_at_utc, subreddit, selftext, aiuthor_fullname, saved, mod_reason_title, gilded, clicked, title,
   // link_flair_richtext{ e:text, t:weekend discussion}, subredit_name_prefixed, link_flair_css_class, link_flair_text
 
-  const date = moment().startOf('day').valueOf()
   await db.collection('counts').doc(`${date}`).set(counts)
   return counts
 }
