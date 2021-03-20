@@ -149,9 +149,9 @@ const getHot = async () => {
   const date = moment().utc().startOf('day').valueOf()
   
   const snapshot = await db.collection('counts').doc(`${date}`).get()
-//   if (snapshot.exists) {
-//       return 'Data already set for this date'
-//   }
+  if (snapshot.exists) {
+      return 'Data already set for this date'
+  }
 
   let counts = {}
   const content = await r.getHot(SUBREDDIT, { limit: 100 } )
