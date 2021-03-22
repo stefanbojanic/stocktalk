@@ -131,11 +131,6 @@ const checkTicker = (allowList, denyList, word) => {
 
 const getHot = async () => {
   const date = moment().utc().startOf('day').valueOf()
-  
-  const snapshot = await db.collection('counts').doc(`${date}`).get()
-  if (snapshot.exists) {
-      return 'Data already set for this date'
-  }
 
   const counts = {}
   const initial = await r.getHot(SUBREDDIT, { limit: 100 } )
