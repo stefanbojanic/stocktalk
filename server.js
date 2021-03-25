@@ -5,6 +5,8 @@ let mustacheExpress = require('mustache-express');
 const { getHot } = require('./utils');
 const { db } = require('./firestore');
 
+const { getDiscussionPosts } = require('./reddit')
+
 const app = express()
 app.engine('mustache', mustacheExpress());
 app.set('view engine', 'mustache');
@@ -70,6 +72,13 @@ app.get('/hot', async (req, res) => {
 
   res.render('hot', view)
 })
+
+
+app.get('/test', async (req, res) => {
+  const asd = await getDiscussionPosts()
+  res.send(asd)
+})
+
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`)

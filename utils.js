@@ -3,7 +3,6 @@ const {
     PROD_KEY,
 } = require('./constants')
 const snoowrap = require('snoowrap');
-const fs = require('fs')
 const vader = require('vader-sentiment');
 const {
     db,
