@@ -18,18 +18,24 @@ admin.initializeApp({
 });
 
 
+let denyCache = {}
+let allowCache = {}
+
 const getAllowList = async () => {
-  const allowList = await db.collection('data').doc('allowList').get()
-  return allowList.data()
+  if (Object.values(allowCache).length < 1) {
+    const allowList = await db.collection('data').doc('allowList').get()
+    allowCache = allowList.data()
+  }
+  return allowCache
 }
 
 const getDenyList = async () => {
-  const denyList = await db.collection('data').doc('denyList').get()
-  return denyList.data()
+  if (Object.values(denyCache).length < 1) {
+    const denyList = await db.collection('data').doc('denyList').get()
+    denyCache = denyList.data()
+  }
+  return denyCache
 }
-
-let denyCache = {}
-let allowCache = {}
 
 const updateList = (type, list) => {
   if(type !== 'allowList' && type !== 'denyList') {

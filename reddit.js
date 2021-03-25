@@ -25,7 +25,7 @@ const getDiscussionPosts = async () => {
     
     let comments = []
     await Promise.all(discussions.map(async dd => {
-         const comment = await dd.expandReplies({ limit: 500, depth: 1}).then(e => e)
+         const comment = await dd.expandReplies({ limit: 10, depth: 1}).then(e => e)
 
          comments = [...comments, ...comment.comments]
     }))
