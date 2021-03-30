@@ -1,7 +1,8 @@
 const snoowrap = require('snoowrap');
 
 const { SUBREDDIT } = require('./constants');
-
+const { getTickers } = require('./utils')
+const vader = require('vader-sentiment');
 
 const r = new snoowrap({
     userAgent: 'wsb-tickerbot',
@@ -30,7 +31,13 @@ const getDiscussionPosts = async () => {
          comments = [...comments, ...comment.comments]
     }))
     
-    return comments.map(comment => comment.body)
+    return Promise.all(comments.map(async comment => {
+        return {
+            tickers: (await getTickers(comment.body)),
+            body: comment.body,
+            sentiment: vader.SentimentIntensityAnalyzer.polarity_scores(comment.body)
+        }
+    }))
 }
 
 
