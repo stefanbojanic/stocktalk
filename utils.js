@@ -134,7 +134,7 @@ const getHot = async () => {
     const initial = await r.getHot(SUBREDDIT, { limit: 100 } )
     const content = await initial.fetchMore({ amount: 30, append: true })
 
-    const counts = await contentsToCounts(content.map(c =>  ({...c, tickerBody: `${post.title} ${post.selftext}`})))
+    const counts = await contentsToCounts(content.map(c =>  ({...c, tickerBody: `${c.title} ${c.selftext}`})))
 
     await saveLists()
     await db.collection('counts').doc(`${date}`).set(counts)
@@ -148,7 +148,7 @@ const contentsToCounts = async (content) => {
     const promises = content.map(async post => {
         const tickers = await getTickers(post.tickerBody)
         if (Object.values(tickers).length> 0) {
-            const sentiment = vader.SentimentIntensityAnalyzer.polarity_scores(`${post.title} ${post.selftext}`)   
+            const sentiment = vader.SentimentIntensityAnalyzer.polarity_scores(post.tickerBody)   
          
             Object.keys(tickers).forEach(ticker => {
                 if (counts[ticker]) {
