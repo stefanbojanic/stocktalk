@@ -1,7 +1,7 @@
 const snoowrap = require('snoowrap');
 
 const { SUBREDDIT } = require('./constants');
-const { getTickers } = require('./utils')
+const { getTickers, contentsToCounts } = require('./utils')
 const vader = require('vader-sentiment');
 
 const r = new snoowrap({
@@ -31,25 +31,8 @@ const getDiscussionPosts = async () => {
          comments = [...comments, ...comment.comments]
     }))
     
-    // const transformer = (counts, ticker, post, sentiment) => {
-    //     if (counts[ticker]) {
-    //         counts[ticker].count += 1
-    //         counts[ticker].upvotes += parseInt(post.ups)
-    //         counts[ticker].sentiment.neg += parseFloat(sentiment.neg)
-    //         counts[ticker].sentiment.neu += parseFloat(sentiment.neu)
-    //         counts[ticker].sentiment.pos += parseFloat(sentiment.pos)
-    //     } else {
-    //         delete sentiment.compound
-    //         counts[ticker] = {
-    //             count: 1,
-    //             upvotes: parseInt(post.ups),
-    //             sentiment: {...sentiment},
-    //         }
-    //     }
-    // }
-
-    // const counts = await contentsToCounts(content, transformer)
-    
+    const counts = await contentsToCounts(comments.map(c => ({...c, tickerBody: c.body})))
+    return counts
     return Promise.all(comments.map(async comment => {
         return {
             tickers: (await getTickers(comment.body)),

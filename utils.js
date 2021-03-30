@@ -134,24 +134,7 @@ const getHot = async () => {
     const initial = await r.getHot(SUBREDDIT, { limit: 100 } )
     const content = await initial.fetchMore({ amount: 30, append: true })
 
-    const transformer = (counts, ticker, post, sentiment) => {
-        if (counts[ticker]) {
-            counts[ticker].count += 1
-            counts[ticker].upvotes += parseInt(post.ups)
-            counts[ticker].sentiment.neg += parseFloat(sentiment.neg)
-            counts[ticker].sentiment.neu += parseFloat(sentiment.neu)
-            counts[ticker].sentiment.pos += parseFloat(sentiment.pos)
-        } else {
-            delete sentiment.compound
-            counts[ticker] = {
-                count: 1,
-                upvotes: parseInt(post.ups),
-                sentiment: {...sentiment},
-            }
-        }
-    }
-
-    const counts = await contentsToCounts(content, transformer)
+    const counts = await contentsToCounts(content.map(c =>  ({...c, tickerBody: `${post.title} ${post.selftext}`})))
 
     await saveLists()
     await db.collection('counts').doc(`${date}`).set(counts)
@@ -159,15 +142,30 @@ const getHot = async () => {
 }
 
 // content is an array of strings, ie body text
-const contentsToCounts = async (content, transformer) => {
+const contentsToCounts = async (content) => {
     const counts = {}
 
     const promises = content.map(async post => {
-        const tickers = await getTickers(`${post.title} ${post.selftext}`)
+        const tickers = await getTickers(post.tickerBody)
         if (Object.values(tickers).length> 0) {
-          const sentiment = vader.SentimentIntensityAnalyzer.polarity_scores(`${post.title} ${post.selftext}`)   
+            const sentiment = vader.SentimentIntensityAnalyzer.polarity_scores(`${post.title} ${post.selftext}`)   
          
-          Object.keys(tickers).forEach(ticker => transformer(counts, ticker, post, sentiment));
+            Object.keys(tickers).forEach(ticker => {
+                if (counts[ticker]) {
+                    counts[ticker].count += 1
+                    counts[ticker].upvotes += parseInt(post.ups)
+                    counts[ticker].sentiment.neg += parseFloat(sentiment.neg)
+                    counts[ticker].sentiment.neu += parseFloat(sentiment.neu)
+                    counts[ticker].sentiment.pos += parseFloat(sentiment.pos)
+                } else {
+                    delete sentiment.compound
+                    counts[ticker] = {
+                        count: 1,
+                        upvotes: parseInt(post.ups),
+                        sentiment: {...sentiment},
+                    }
+                }
+            });
         }
     })
 
