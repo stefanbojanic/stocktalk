@@ -3,6 +3,7 @@ const snoowrap = require('snoowrap');
 const { SUBREDDIT } = require('./constants');
 const { getTickers, contentsToCounts } = require('./utils')
 const vader = require('vader-sentiment');
+const { db } = require('./firestore');
 
 const r = new snoowrap({
     userAgent: 'wsb-tickerbot',
@@ -12,12 +13,10 @@ const r = new snoowrap({
     password: 'PoonaniPrince69'
 });
 
-let ddCursor = 0
-let ddCursorOffset = 0
-let ddCursorId = ""
-
 const getDiscussionPosts = async () => {
-    console.log('Cursor:', ddCursor, ddCursorOffset, ddCursorId)
+    const cursorRef = db.collection('data').doc('ddCursor')
+    const cursor = (await cursorRef.get()).data()
+    console.log('Cursor:', cursor)
     const posts = await r.getHot(SUBREDDIT, { limit: 0 } )
     const discussions = []
     const pinned = []
@@ -26,15 +25,15 @@ const getDiscussionPosts = async () => {
             discussions.push(post)
 
             // Cursor stuff could get messed if multiple pinned discussions
-            if (ddCursorId === post.id) {
+            if (cursor.id === post.id) {
                 // This is the same post we've seen earlier today
-                ddCursorOffset = post.num_comments - ddCursor
-                ddCursor = post.num_comments
+                cursor.offset = post.num_comments - cursor.numSeen
+                cursor.numSeen = post.num_comments
             } else {
                 // We need to reset cursor, this is a new post
-                ddCursor = post.num_comments
-                ddCursorOffset = 300 // Amount of comments to grab if we havent seen this post before
-                ddCursorId = post.id
+                cursor.numSeen = post.num_comments
+                cursor.offset = 300 // Amount of comments to grab if we havent seen this post before
+                cursor.id = post.id
             }
 
         } else if (post.stickied) {
@@ -42,11 +41,13 @@ const getDiscussionPosts = async () => {
         }
     })
 
+    await cursorRef.set(cursor)
+
     
     let comments = []
     await Promise.all(discussions.map(async dd => {
-        console.log(`Getting ${ddCursorOffset} comments from post ${ddCursorId}`)
-        const comment = await dd.expandReplies({ limit: ddCursorOffset, depth: 1}).then(e => e)
+        console.log(`Getting ${cursor.offset} comments from post ${cursor.id}`)
+        const comment = await dd.expandReplies({ limit: cursor.offset, depth: 1}).then(e => e)
 
         console.log(`Got ${comment.comments.length} comments`)
 

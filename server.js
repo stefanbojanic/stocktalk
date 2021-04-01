@@ -5,6 +5,7 @@ let mustacheExpress = require('mustache-express');
 const { getHot } = require('./utils');
 const { db } = require('./firestore');
 
+const { formatDiscussion } = require('./dataFormat')
 const { getDiscussionPosts } = require('./reddit')
 
 const app = express()
@@ -77,6 +78,13 @@ app.get('/hot', async (req, res) => {
 app.get('/test', async (req, res) => {
   const asd = await getDiscussionPosts()
   res.send(asd)
+})
+
+app.get('/discussion', async (req, res) => {
+  const timestamp = moment().utc().startOf('day').valueOf()
+  const snapshot = await db.collection('discussionCounts').doc(`${timestamp}`).get()
+  res.send(formatDiscussion(snapshot.data()))
+  // res.render('discussion')
 })
 
 

@@ -14,20 +14,9 @@
         body {            
             font-family: 'Fira Sans', sans-serif;
         }
-        table {
-            font-family: 'Fira Mono', monospace;
-            border-collapse: collapse;
-            min-width: 600px;
-        }
-        
-        td, th {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 8px;
-        }
-        
-        tr:nth-child(even) {
-            background-color: #dddddd;
+
+        canvas {
+            max-width: 700px;
         }
     </style>
 
@@ -35,25 +24,40 @@
 
 <body>
     Welcome to Stocktalk. 10m trailing discussion sentiment {{date}}:
-    <table>
-        <tr>
-            <th>Ticker</th>
-            <th>Upvotes</th>
-            <th>Posts</th>
-            <th>Bull</th>
-            <th>Bear</th>
-            <th>Neutral</th>
-        </tr>
-        {{#tickers}}
-            <tr>
-                <td>{{ticker}}</td>
-                <td>{{upvotes}}</td>
-                <td>{{count}}</td>
-                <td>{{#toFixed}}{{sentiment.pos}}{{/toFixed}}%</td>
-                <td>{{#toFixed}}{{sentiment.neg}}{{/toFixed}}%</td>
-                <td>{{#toFixed}}{{sentiment.neu}}{{/toFixed}}%</td>
-            </tr>
-        {{/tickers}}
-    </table>
+    <canvas id="myChart" width="200" height="100"></canvas>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    
+    <script>
+        var ctx = document.getElementById('myChart');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [12, 19, 3, 5, 2, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
 </body>
 </html>
