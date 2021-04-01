@@ -17,6 +17,70 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
+
+let denyCache = {}
+let allowCache = {}
+
+const getAllowList = async () => {
+  if (Object.values(allowCache).length < 1) {
+    const allowList = await db.collection('data').doc('allowList').get()
+    allowCache = allowList.data()
+  }
+  return allowCache
+}
+
+const getDenyList = async () => {
+  if (Object.values(denyCache).length < 1) {
+    const denyList = await db.collection('data').doc('denyList').get()
+    denyCache = denyList.data()
+  }
+  return denyCache
+}
+
+const updateList = (type, list) => {
+  if(type !== 'allowList' && type !== 'denyList') {
+      console.error('Must use either allowList or denyList')
+      return false
+  }
+
+  if(type === 'allowList') {
+    allowCache = {
+      ...allowCache,
+      ...list
+    }
+  }
+
+  if(type === 'denyList') {
+    denyCache = {
+      ...denyCache,
+      ...list
+    }
+  }
+}
+
+const saveLists = async () => {
+  console.log('Saving caches')
+
+  if(Object.values(allowCache).length >= 1) {
+    await db.collection('data').doc('allowList').update(allowCache)
+    allowCache = {}
+  }
+
+  if(Object.values(denyCache).length >= 1) {
+    await db.collection('data').doc('denyList').update(denyCache)
+    denyCache = {}
+  }
+  
+  
+  console.log('Successfully saved caches', allowCache, denyCache)
+}
+
 const db = admin.firestore();
 
-module.exports = db
+module.exports = {
+  db,
+  getAllowList,
+  getDenyList,
+  updateList,
+  saveLists
+}

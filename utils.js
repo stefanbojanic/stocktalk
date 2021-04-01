@@ -3,13 +3,14 @@ const {
     PROD_KEY,
 } = require('./constants')
 const snoowrap = require('snoowrap');
+const vader = require('vader-sentiment');
 const {
+    db,
     getAllowList,
     getDenyList,
-    updateList
-} = require('./db')
-const vader = require('vader-sentiment');
-const db = require('./firestore');
+    updateList,
+    saveLists
+} = require('./firestore');
 const moment = require('moment');
 const httpRequest = require('./http');
 const constants = require('./constants');
@@ -18,6 +19,10 @@ const SUBREDDIT = constants.WALLSTREETBETS
 
 const sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function roundDate(date, duration, method) {
+    return moment(Math[method]((+date) / (+duration)) * (+duration)); 
 }
 
 const r = new snoowrap({
@@ -49,12 +54,11 @@ const getTickers = async (text) => {
     const tickers = {}
     const denyTickers = {}
         
-    const allowList = getAllowList()
-    const denyList = getDenyList()
+    const allowList = await getAllowList()
+    const denyList = await getDenyList()
 
     const checkWords = uniqueWords.map(async word => {
-        await sleep(200);
-        return checkTicker(allowList, denyList, word.toUpperCase())
+        return await checkTicker(allowList, denyList, word.toUpperCase())
     })
 
     await Promise.all(checkWords).then(res => {
@@ -71,53 +75,37 @@ const getTickers = async (text) => {
         })
     })
 
-    updateList('denyList', denyTickers)
-    updateList('allowList', tickers)
+    await updateList('denyList', denyTickers)
+    await updateList('allowList', tickers)
     
     return tickers
-}
-
-const updateTickers = (tickers, counts, post, sentiment) => {
-    Object.keys(tickers).forEach(ticker => {
-        if (counts[ticker]) {
-            counts[ticker].count += 1
-            counts[ticker].upvotes += post.ups
-            counts[ticker].sentiment.neg += sentiment.neg
-            counts[ticker].sentiment.neu += sentiment.neu
-            counts[ticker].sentiment.pos += sentiment.pos
-        } else {
-            delete sentiment.compound
-            counts[ticker] = {
-                count: 1,
-                upvotes: post.ups,
-                sentiment,
-            }
-        }
-    });
-    return counts;
 }
 
 const checkTicker = (allowList, denyList, word) => {
     return new Promise((resolve, reject) => {
 
+        if (!word) {            
+            return resolve({ticker: word, status: 'deny'})
+        }
+
         if (allowList[word]) {
-            console.log('Cache allow', word)
+            // console.log('Cache allow', word)
             return resolve({ticker: word, status: 'allow'})
         }
     
         if (denyList[word]) {
-            console.log('Cache deny', word)
+            // console.log('Cache deny', word)
             return resolve({ticker: word, status: 'deny'})
         }
     
         const params = {
-            hostname: 'sandbox.iexapis.com', // use cloud.iexapis.com for real, sandbox.iexapis.com to test
+            hostname: 'cloud.iexapis.com', // use cloud.iexapis.com for real, sandbox.iexapis.com to test
             port: 443,
             method: 'GET',
-            path: '/stable/stock/' + word + '/quote?token=' + API_KEY // API_KEY or PROD_KEY
+            path: '/stable/stock/' + word + '/quote?token=' + PROD_KEY // API_KEY or PROD_KEY
         }
 
-        console.log(params.path)
+        // console.log(params.path)
 
         return httpRequest(params)
         .then((data) => {
@@ -145,29 +133,54 @@ const checkTicker = (allowList, denyList, word) => {
 }
 
 const getHot = async () => {
-  const date = moment().startOf('day').valueOf()
-  
-  const snapshot = await db.collection('counts').doc(`${date}`).get()
-  if (snapshot.exists) {
-      return 'Data already set for this date'
-  }
+    const date = moment().utc().startOf('day').valueOf()
 
-  let counts = {}
-  const content = await r.getHot(SUBREDDIT, { limit: 100 } )
-  await content.fetchMore({ amount: 200, append: true })
-    .map(async post => {
-      const tickers = await getTickers(post.title + post.selftext)
-      const sentiment = vader.SentimentIntensityAnalyzer.polarity_scores(post.title + post.selftext)   
-      counts = updateTickers(tickers, counts, post, sentiment);
-    });
-  // url, approved_at_utc, subreddit, selftext, aiuthor_fullname, saved, mod_reason_title, gilded, clicked, title,
-  // link_flair_richtext{ e:text, t:weekend discussion}, subredit_name_prefixed, link_flair_css_class, link_flair_text
+    const initial = await r.getHot(SUBREDDIT, { limit: 100 } )
+    const content = await initial.fetchMore({ amount: 30, append: true })
 
-  await db.collection('counts').doc(`${date}`).set(counts)
-  return counts
+    const counts = await contentsToCounts(content.map(c =>  ({...c, tickerBody: `${c.title} ${c.selftext}`})))
+
+    await saveLists()
+    await db.collection('counts').doc(`${date}`).set(counts)
+    return counts
 }
 
+// content is an array of strings, ie body text
+const contentsToCounts = async (content) => {
+    const counts = {}
+
+    const promises = content.map(async post => {
+        const tickers = await getTickers(post.tickerBody)
+        if (Object.values(tickers).length> 0) {
+            const sentiment = vader.SentimentIntensityAnalyzer.polarity_scores(post.tickerBody)   
+         
+            Object.keys(tickers).forEach(ticker => {
+                if (counts[ticker]) {
+                    counts[ticker].count += 1
+                    counts[ticker].upvotes += parseInt(post.ups)
+                    counts[ticker].sentiment.neg += parseFloat(sentiment.neg)
+                    counts[ticker].sentiment.neu += parseFloat(sentiment.neu)
+                    counts[ticker].sentiment.pos += parseFloat(sentiment.pos)
+                } else {
+                    delete sentiment.compound
+                    counts[ticker] = {
+                        count: 1,
+                        upvotes: parseInt(post.ups),
+                        sentiment: {...sentiment},
+                    }
+                }
+            });
+        }
+    })
+
+    await Promise.all(promises);
+
+    return counts
+}
 
 module.exports = {
     getHot,
+    getTickers,
+    contentsToCounts,
+    roundDate
 }

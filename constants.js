@@ -1,5 +1,6 @@
 module.exports = {
     WALLSTREETBETS: "wallstreetbets",
+    SUBREDDIT: "wallstreetbets",
     INVESTING: "investing",
     STOCKS: "stocks",
     subreddits: [],
