@@ -21,6 +21,10 @@ const sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function roundDate(date, duration, method) {
+    return moment(Math[method]((+date) / (+duration)) * (+duration)); 
+}
+
 const r = new snoowrap({
     userAgent: 'wsb-tickerbot',
     clientId: 'sXFsYdT2GlAZfQ',
@@ -177,5 +181,6 @@ const contentsToCounts = async (content) => {
 module.exports = {
     getHot,
     getTickers,
-    contentsToCounts
+    contentsToCounts,
+    roundDate
 }

@@ -33,14 +33,6 @@ const getDiscussionPosts = async () => {
     
     const counts = await contentsToCounts(comments.map(c => ({...c, tickerBody: c.body})))
     return counts
-    return Promise.all(comments.map(async comment => {
-        return {
-            tickers: (await getTickers(comment.body)),
-            body: comment.body,
-            upvotes: comment.ups,
-            sentiment: vader.SentimentIntensityAnalyzer.polarity_scores(comment.body)
-        }
-    }))
 }
 
 
