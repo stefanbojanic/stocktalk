@@ -3,7 +3,6 @@ const {
     PROD_KEY,
 } = require('./constants')
 const snoowrap = require('snoowrap');
-const fs = require('fs')
 const vader = require('vader-sentiment');
 const {
     db,
@@ -20,6 +19,10 @@ const SUBREDDIT = constants.WALLSTREETBETS
 
 const sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function roundDate(date, duration, method) {
+    return moment(Math[method]((+date) / (+duration)) * (+duration)); 
 }
 
 const r = new snoowrap({
@@ -130,44 +133,54 @@ const checkTicker = (allowList, denyList, word) => {
 }
 
 const getHot = async () => {
-  const date = moment().utc().startOf('day').valueOf()
+    const date = moment().utc().startOf('day').valueOf()
 
-  const counts = {}
-  const initial = await r.getHot(SUBREDDIT, { limit: 100 } )
-  const content = await initial.fetchMore({ amount: 30, append: true })
-//   const content = JSON.parse(fs.readFileSync('./reddit.json'))
-  
-    const promises = content.map(async post => {
-      const tickers = await getTickers(`${post.title} ${post.selftext}`)
-      if (Object.values(tickers).length> 0) {
-        const sentiment = vader.SentimentIntensityAnalyzer.polarity_scores(`${post.title} ${post.selftext}`)   
-       
-        Object.keys(tickers).forEach(ticker => {
-            if (counts[ticker]) {
-                counts[ticker].count += 1
-                counts[ticker].upvotes += parseInt(post.ups)
-                counts[ticker].sentiment.neg += parseFloat(sentiment.neg)
-                counts[ticker].sentiment.neu += parseFloat(sentiment.neu)
-                counts[ticker].sentiment.pos += parseFloat(sentiment.pos)
-            } else {
-                delete sentiment.compound
-                counts[ticker] = {
-                    count: 1,
-                    upvotes: parseInt(post.ups),
-                    sentiment: {...sentiment},
-                }
-            }
-        });
-      }
-    });
+    const initial = await r.getHot(SUBREDDIT, { limit: 100 } )
+    const content = await initial.fetchMore({ amount: 30, append: true })
 
-    await Promise.all(promises);
-    
+    const counts = await contentsToCounts(content.map(c =>  ({...c, tickerBody: `${c.title} ${c.selftext}`})))
+
     await saveLists()
     await db.collection('counts').doc(`${date}`).set(counts)
     return counts
 }
 
+// content is an array of strings, ie body text
+const contentsToCounts = async (content) => {
+    const counts = {}
+
+    const promises = content.map(async post => {
+        const tickers = await getTickers(post.tickerBody)
+        if (Object.values(tickers).length> 0) {
+            const sentiment = vader.SentimentIntensityAnalyzer.polarity_scores(post.tickerBody)   
+         
+            Object.keys(tickers).forEach(ticker => {
+                if (counts[ticker]) {
+                    counts[ticker].count += 1
+                    counts[ticker].upvotes += parseInt(post.ups)
+                    counts[ticker].sentiment.neg += parseFloat(sentiment.neg)
+                    counts[ticker].sentiment.neu += parseFloat(sentiment.neu)
+                    counts[ticker].sentiment.pos += parseFloat(sentiment.pos)
+                } else {
+                    delete sentiment.compound
+                    counts[ticker] = {
+                        count: 1,
+                        upvotes: parseInt(post.ups),
+                        sentiment: {...sentiment},
+                    }
+                }
+            });
+        }
+    })
+
+    await Promise.all(promises);
+
+    return counts
+}
+
 module.exports = {
     getHot,
+    getTickers,
+    contentsToCounts,
+    roundDate
 }

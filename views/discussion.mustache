@@ -1,0 +1,59 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>Stocktalk - Discussion Sentiment</title>
+    <meta name="description" content="Stocktalk">
+    <meta name="author" content="Stocktalk">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@500&family=Fira+Sans&display=swap" rel="stylesheet">
+
+    <style>
+        body {            
+            font-family: 'Fira Sans', sans-serif;
+        }
+        table {
+            font-family: 'Fira Mono', monospace;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+        
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+
+</head>
+
+<body>
+    Welcome to Stocktalk. 10m trailing discussion sentiment {{date}}:
+    <table>
+        <tr>
+            <th>Ticker</th>
+            <th>Upvotes</th>
+            <th>Posts</th>
+            <th>Bull</th>
+            <th>Bear</th>
+            <th>Neutral</th>
+        </tr>
+        {{#tickers}}
+            <tr>
+                <td>{{ticker}}</td>
+                <td>{{upvotes}}</td>
+                <td>{{count}}</td>
+                <td>{{#toFixed}}{{sentiment.pos}}{{/toFixed}}%</td>
+                <td>{{#toFixed}}{{sentiment.neg}}{{/toFixed}}%</td>
+                <td>{{#toFixed}}{{sentiment.neu}}{{/toFixed}}%</td>
+            </tr>
+        {{/tickers}}
+    </table>
+</body>
+</html>
