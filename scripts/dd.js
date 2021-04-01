@@ -13,16 +13,14 @@ const dd = async () => {
 
     const roundedDate = roundDate(now, moment.duration(10, 'minutes'), 'floor').valueOf()
 
-    console.log(roundedDate)
-
     const counts = await getDiscussionPosts()
-
-    console.log(counts)
 
     await saveLists()
     await db.collection('discussionCounts').doc(`${date}`).set({
         [roundedDate]: counts,
     }, { merge: true })
+
+    console.log("Saved DD for", roundedDate)
 };
 
 dd();
