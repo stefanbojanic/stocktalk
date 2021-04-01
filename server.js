@@ -79,6 +79,10 @@ app.get('/test', async (req, res) => {
   res.send(asd)
 })
 
+app.get('/discussion', async (req, res) => {
+  res.render('discussion')
+})
+
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`)
