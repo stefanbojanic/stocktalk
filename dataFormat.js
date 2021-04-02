@@ -1,5 +1,11 @@
 const moment = require('moment');
 
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 const formatDiscussion = (discussion, topTickers) => {
     
     const ticker = 'TSLA'
@@ -47,53 +53,16 @@ const formatDiscussion = (discussion, topTickers) => {
 
         })
     })
-
-    console.log(tickerData)
-
-    const tickers = Object.keys(topTickers)
-
-    const cumulativeDatasets = [
+    
+    const cumulativeDatasets = Object.keys(topTickers).map(ticker => (
         {
-            spanGaps: true,
-            label: tickers[0],
-            data: tickerData[tickers[0]],
-            borderColor: 'rgba(228, 145, 67, 1)',
-            backgroundColor: 'rgba(61, 203, 101, 0)',
-            borderWidth: 2,
-        },
-        {
-            spanGaps: true,
-            label: tickers[1],
-            data: tickerData[tickers[1]],
-            borderColor: 'rgba(70, 228, 67, 1)',
-            backgroundColor: 'rgba(61, 203, 101, 0)',
-            borderWidth: 2,
-        },
-        {
-            spanGaps: true,
-            label: tickers[2],
-            data: tickerData[tickers[2]],
-            borderColor: 'rgba(145, 67, 228, 1)',
-            backgroundColor: 'rgba(61, 203, 101, 0)',
-            borderWidth: 2,
-        },
-        {
-            spanGaps: true,
-            label: tickers[3],
-            data: tickerData[tickers[3]],
-            borderColor: 'rgba(228, 67, 150, 1)',
-            backgroundColor: 'rgba(61, 203, 101, 0)',
-            borderWidth: 2,
-        },
-        {
-            spanGaps: true,
-            label: tickers[4],
-            data: tickerData[tickers[4]],
-            borderColor: 'rgba(63, 127, 191, 1)',
+            label: ticker,
+            data: tickerData[ticker],
+            borderColor: `rgba(${getRandomInt(0, 255)}, ${getRandomInt(0, 255)}, ${getRandomInt(0, 255)}, 1)`,
             backgroundColor: 'rgba(61, 203, 101, 0)',
             borderWidth: 2,
         }
-    ]
+    ))
 
     const datasets = [
         {
