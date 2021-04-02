@@ -23,20 +23,41 @@
 </head>
 
 <body>
-    Welcome to Stocktalk.
-    <canvas id="myChart" width="200" height="100"></canvas>
+    Welcome to Stocktalk. TSLA
+    <canvas id="chart" width="200" height="100"></canvas>
+    <canvas id="cumulativeChart" width="200" height="100"></canvas>
 
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
     
     <script>
-        var ctx = document.getElementById('myChart');
+        var ctx = document.getElementById('chart');
         var myChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: {{{labels}}},
                 datasets: {{{datasets}}}
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+
+    <script>
+        var ctx = document.getElementById('cumulativeChart');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{{labels}}},
+                datasets: {{{cumulativeDatasets}}}
             },
             options: {
                 scales: {
