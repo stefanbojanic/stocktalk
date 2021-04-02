@@ -2,23 +2,23 @@ const moment = require('moment');
 
 const formatDiscussion = (discussion) => {
     const ticker = 'TSLA'
-    const bull = []
-    const bear = []
-    const total = []
+    const bull = [0]
+    const bear = [0]
+    const total = [0]
     const labels = []
     const sortedDates = Object.keys(discussion).sort()
 
     sortedDates.forEach(date => {
-        total.push(null)
-        bull.push(null)
-        bear.push(null)
+        total.push(total[total.length - 1])
+        bull.push(bull[bull.length - 1])
+        bear.push(bear[bear.length - 1])
         labels.push(moment.unix(date/1000).format('LT'))
         
         Object.entries(discussion[date]).forEach(([k, v]) => {
             if (k === ticker) {
-                total[total.length - 1] = v.count
-                bull[bull.length - 1] = v.sentiment.pos * v.count
-                bear[bear.length - 1] = (v.sentiment.neg + v.sentiment.pos) * v.count
+                total[total.length - 1] = total[total.length - 2] + v.count
+                bull[bull.length - 1] = bull[bull.length - 2] + v.sentiment.pos * v.count
+                bear[bear.length - 1] = bear[bear.length - 2] + (v.sentiment.neg + v.sentiment.pos) * v.count
             }
         })
     })
