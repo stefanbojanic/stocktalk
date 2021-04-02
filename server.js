@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express');
 const moment = require('moment');
 let mustacheExpress = require('mustache-express');
-const { getHot } = require('./utils');
+const { getHot, getTopTickers } = require('./utils');
 const { db } = require('./firestore');
 
 const { formatDiscussion } = require('./dataFormat')
@@ -81,10 +81,11 @@ app.get('/test', async (req, res) => {
 })
 
 app.get('/discussion', async (req, res) => {
-  const timestamp = moment().utc().startOf('day').valueOf()
-  const snapshot = await db.collection('discussionCounts').doc(`${timestamp}`).get()
+  const date = moment().utc().startOf('day').valueOf()
+  const snapshot = await db.collection('discussionCounts').doc(`${date}`).get()
   // res.send(formatDiscussion(snapshot.data()))
-  const { datasets, cumulativeDatasets, labels } = formatDiscussion(snapshot.data())
+  const topTickers = await getTopTickers(date, 5)
+  const { datasets, cumulativeDatasets, labels } = formatDiscussion(snapshot.data(), topTickers)
 
   const view = {
     ticker: 'TSLA',

@@ -40,7 +40,13 @@ const getTopTickers = async (date, limit) => {
         return 0;
     })
 
-    return tickers.slice(0, limit)
+    const tickerMap = {}
+
+    tickers.slice(0, limit).forEach(ticker => {
+        tickerMap[ticker] = 1
+    })
+
+    return tickerMap
 }
 
 const r = new snoowrap({
