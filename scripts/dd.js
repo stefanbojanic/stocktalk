@@ -19,7 +19,7 @@ const dd = async () => {
 
     const topTickersDoc = await topTickersRef.get()
     if (!topTickersDoc.exists) {
-        topTickersRef.set({ existential: true })
+        topTickersRef.set({ SPY: 0 })
     }
 
     const updateStatement = {}
@@ -27,7 +27,7 @@ const dd = async () => {
     for(ticker in counts) {
         updateStatement[ticker] = increment(counts[ticker].count)
     }
-    
+
     await topTickersRef.update(updateStatement)
 
     await saveLists()
