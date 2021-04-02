@@ -78,6 +78,7 @@ const saveLists = async () => {
 const db = admin.firestore();
 
 module.exports = {
+  increment: admin.firestore.FieldValue.increment,
   db,
   getAllowList,
   getDenyList,
