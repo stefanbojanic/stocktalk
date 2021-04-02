@@ -21,7 +21,7 @@ const getDiscussionPosts = async () => {
     const discussions = []
     const pinned = []
     posts.forEach(post => {
-        if(post.link_flair_richtext.find(f => f.t === "Daily Discussion")) {
+        if(post.link_flair_richtext.find(f => f.t === "Daily Discussion") || post.link_flair_richtext.find(f => f.t === "Weekend Discussion")) {
             discussions.push(post)
 
             // Cursor stuff could get messed if multiple pinned discussions
