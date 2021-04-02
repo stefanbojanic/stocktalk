@@ -83,8 +83,16 @@ app.get('/test', async (req, res) => {
 app.get('/discussion', async (req, res) => {
   const timestamp = moment().utc().startOf('day').valueOf()
   const snapshot = await db.collection('discussionCounts').doc(`${timestamp}`).get()
-  res.send(formatDiscussion(snapshot.data()))
-  // res.render('discussion')
+  // res.send(formatDiscussion(snapshot.data()))
+  const { datasets, labels } = formatDiscussion(snapshot.data())
+
+  const view = {
+    ticker: 'TSLA',
+    datasets: JSON.stringify(datasets),
+    labels: JSON.stringify(labels),
+  }
+
+  res.render('discussion', view)
 })
 
 
