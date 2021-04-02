@@ -1,6 +1,6 @@
 const moment = require('moment');
 const { getDiscussionPosts } = require('../reddit');
-const { roundDate } = require('../utils');
+const { roundDate, getTopTickers } = require('../utils');
 const {
     db,
     increment,
@@ -8,9 +8,12 @@ const {
 } = require('../firestore');
 
 const dd = async () => {
+
     
     const date = moment().utc().startOf('day').valueOf()
     const now = moment().utc()
+
+    console.log(await getTopTickers(date, 5))
 
     const topTickersRef = db.collection('discussionTopTickers').doc(`${date}`)
     const roundedDate = roundDate(now, moment.duration(10, 'minutes'), 'floor').valueOf()

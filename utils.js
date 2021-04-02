@@ -25,6 +25,24 @@ function roundDate(date, duration, method) {
     return moment(Math[method]((+date) / (+duration)) * (+duration)); 
 }
 
+const getTopTickers = async (date, limit) => {
+    const tickerCounts = (await db.collection('discussionTopTickers').doc(`${date}`).get()).data()
+    
+    const tickers = Object.keys(tickerCounts)
+
+    tickers.sort((x, y) => {
+        if (tickerCounts[x] < tickerCounts[y]) {
+        return 1;
+        }
+        if (tickerCounts[x] > tickerCounts[y]) {
+        return -1;
+        }
+        return 0;
+    })
+
+    return tickers.slice(0, limit)
+}
+
 const r = new snoowrap({
     userAgent: 'wsb-tickerbot',
     clientId: 'sXFsYdT2GlAZfQ',
@@ -181,6 +199,7 @@ const contentsToCounts = async (content) => {
 module.exports = {
     getHot,
     getTickers,
+    getTopTickers,
     contentsToCounts,
     roundDate
 }
