@@ -19,6 +19,7 @@ const formatDiscussion = (discussion, topTickers, ticker) => {
 
     const bull = []
     const bear = []
+    const mentions = []
 
     const labels = []
     const sortedDates = Object.keys(discussion).sort()
@@ -34,6 +35,7 @@ const formatDiscussion = (discussion, topTickers, ticker) => {
 
         bull.push(null)
         bear.push(null)
+        mentions.push(null)
 
         labels.push(moment.unix(date/1000).format('LT'))
         
@@ -44,6 +46,7 @@ const formatDiscussion = (discussion, topTickers, ticker) => {
                 cumuBear[cumuBear.length - 1] = cumuBear[cumuBear.length - 2] + (v.sentiment.neg + v.sentiment.pos) * v.count
                 bull[bull.length - 1] = v.sentiment.pos
                 bear[bear.length - 1] = v.sentiment.neg + v.sentiment.pos
+                mentions[mentions.length - 1] = v.sentiment.neg + v.sentiment.pos + v.sentiment.neu
             }
 
             if (topTickers[k]) {
@@ -80,14 +83,14 @@ const formatDiscussion = (discussion, topTickers, ticker) => {
             borderColor: 'rgba(61, 203, 101, 0)',
             borderWidth: 2
         },
-        // {
-        //     spanGaps: true,
-        //     label: 'mentions',
-        //     data: total,
-        //     backgroundColor: 'rgba(255, 99, 132, 0)',
-        //     borderColor: 'rgba(63, 127, 191, 1)',
-        //     borderWidth: 2
-        // }
+        {
+            spanGaps: true,
+            label: ticker + ' total mentions',
+            data: total,
+            backgroundColor: 'rgba(255, 99, 132, 0)',
+            borderColor: 'rgba(63, 127, 191, 1)',
+            borderWidth: 2
+        }
     ]
 
     return { cumulativeDatasets, datasets, labels}
