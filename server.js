@@ -6,7 +6,7 @@ const { getHot, getTopTickers } = require('./utils');
 const { db } = require('./firestore');
 
 const { formatDiscussion } = require('./dataFormat')
-const { getDiscussionPosts } = require('./reddit')
+const { getDiscussionPosts, getPinnedPosts } = require('./reddit')
 
 const app = express()
 app.engine('mustache', mustacheExpress());
@@ -22,9 +22,6 @@ const port = process.env.PORT || 3000
 app.get('/', async (req, res) => {
   const date = req.query.date
   const timestamp = moment(date).utc().startOf('day').valueOf()
-
-  console.log(timestamp)
-  console.log(req.query)
 
   let snapshot = await db.collection('counts').doc(`${timestamp}`).get()
 
@@ -89,11 +86,14 @@ app.get('/discussion', async (req, res) => {
   const ticker = req.query.ticker || Object.keys(topTickers)[0]
   const { datasets, cumulativeDatasets, labels } = formatDiscussion(snapshot.data(), topTickers, ticker)
 
+  const pinnedPosts = await getPinnedPosts()
+
   const view = {
     datasets: JSON.stringify(datasets),
     cumulativeDatasets: JSON.stringify(cumulativeDatasets),
     labels: JSON.stringify(labels),
-    tickers: Object.keys(topTickers)
+    tickers: Object.keys(topTickers),
+    pinnedPosts
   }
 
   res.render('discussion', view)

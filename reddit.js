@@ -53,7 +53,18 @@ const getDiscussionPosts = async () => {
     return counts
 }
 
+getPinnedPosts = async () => {
+    const posts = await r.getHot(SUBREDDIT, { limit: 0 } )
+    return posts.filter(post => post.stickied).map(post => {
+        return {
+            link: post.permalink,
+            title: post.title,
+        }
+    })
+}
+
 
 module.exports = {
-    getDiscussionPosts
+    getDiscussionPosts,
+    getPinnedPosts
 }

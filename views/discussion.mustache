@@ -15,8 +15,16 @@
             font-family: 'Fira Sans', sans-serif;
         }
 
+        .content {
+            overflow: hidden;
+        }
+
         canvas {
             max-width: 700px;
+        }
+
+        .tickers {
+            padding: 0;
         }
 
         .tickers li {
@@ -29,18 +37,29 @@
 
 <body>
     {{ > sidebar }}
-    <h2>Daily Discussion</h2>
-    <p>Today's top 5 tickers</p>
-    <ul class="tickers">
-        {{#tickers}}
-            <li>
-                <a href="/discussion?ticker={{.}}">{{.}}</a>
-            </li>
-        {{/tickers}}
-    </ul>
-    <canvas id="chart" width="200" height="100"></canvas>
-    <canvas id="cumulativeChart" width="200" height="100"></canvas>
+    <div class="content">
+        <h2>Daily Discussion</h2>
+        <p>Today's top 5 tickers</p>
+        <ul class="tickers">
+            {{#tickers}}
+                <li>
+                    <a href="/discussion?ticker={{.}}">{{.}}</a>
+                </li>
+            {{/tickers}}
+        </ul>
 
+        <p>Current pinned posts</p>
+        <ul>
+            {{#pinnedPosts}}
+                <li>
+                    <a href="https://reddit.com{{link}}" target="_blank" rel="noopener noreferrer">{{title}}</a>
+                </li>
+            {{/pinnedPosts}}
+        </ul>
+
+        <canvas id="chart" width="200" height="100"></canvas>
+        <canvas id="cumulativeChart" width="200" height="100"></canvas>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
 
     <script>

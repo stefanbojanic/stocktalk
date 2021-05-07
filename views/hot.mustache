@@ -19,7 +19,9 @@
             border-collapse: collapse;
             min-width: 600px;
         }
-        
+        .content {
+            overflow: hidden;
+        }
         td, th {
             border: 1px solid #dddddd;
             text-align: left;
@@ -35,7 +37,7 @@
 
 <body>
     {{ > sidebar }}
-    <div>
+    <div class="content">
         <h2>Hottest tickers for {{date}}</h2>
         <form action="/">
             <label for="birthday">Date to view:</label>
