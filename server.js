@@ -91,6 +91,7 @@ app.get('/discussion', async (req, res) => {
     datasets: JSON.stringify(datasets),
     cumulativeDatasets: JSON.stringify(cumulativeDatasets),
     labels: JSON.stringify(labels),
+    tickers: Object.keys(topTickers)
   }
 
   res.render('discussion', view)

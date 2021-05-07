@@ -18,6 +18,11 @@
         canvas {
             max-width: 700px;
         }
+
+        .tickers li {
+            display: inline;
+            padding: 10px;
+        }
     </style>
 
 </head>
@@ -25,11 +30,18 @@
 <body>
     {{ > sidebar }}
     <h2>Daily Discussion</h2>
+    <ul class="tickers">
+        {{#tickers}}
+            <li>
+                <a href="/discussion?ticker={{.}}">{{.}}</a>
+            </li>
+        {{/tickers}}
+    </ul>
     <canvas id="chart" width="200" height="100"></canvas>
     <canvas id="cumulativeChart" width="200" height="100"></canvas>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-    
+
     <script>
         var ctx = document.getElementById('chart');
         var myChart = new Chart(ctx, {
