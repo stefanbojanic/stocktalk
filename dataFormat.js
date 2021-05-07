@@ -29,7 +29,7 @@ const formatDiscussion = (discussion, topTickers) => {
             tickerData[ticker].push(tickerData[ticker][tickerData[ticker].length - 1])
         })
 
-        total.push(total[total.length - 1])
+        total.push(null)
         cumuBull.push(cumuBull[cumuBull.length - 1])
         cumuBear.push(cumuBear[cumuBear.length - 1])
 
@@ -40,11 +40,11 @@ const formatDiscussion = (discussion, topTickers) => {
         
         Object.entries(discussion[date]).forEach(([k, v]) => {
             if (k === ticker) {
-                total[total.length - 1] = total[total.length - 2] + v.count
+                total[total.length - 1] = v.count
                 cumuBull[cumuBull.length - 1] = cumuBull[cumuBull.length - 2] + v.sentiment.pos * v.count
                 cumuBear[cumuBear.length - 1] = cumuBear[cumuBear.length - 2] + (v.sentiment.neg + v.sentiment.pos) * v.count
-                bull[bull.length - 1] = v.sentiment.pos * v.count
-                bear[bear.length - 1] = (v.sentiment.neg + v.sentiment.pos) * v.count
+                bull[bull.length - 1] = v.sentiment.pos
+                bear[bear.length - 1] = v.sentiment.neg + v.sentiment.pos
             }
 
             if (topTickers[k]) {
@@ -81,14 +81,14 @@ const formatDiscussion = (discussion, topTickers) => {
             borderColor: 'rgba(61, 203, 101, 0)',
             borderWidth: 2
         },
-        {
-            spanGaps: true,
-            label: 'total',
-            data: bear,
-            backgroundColor: 'rgba(255, 99, 132, 0)',
-            borderColor: 'rgba(63, 127, 191, 1)',
-            borderWidth: 2
-        }
+        // {
+        //     spanGaps: true,
+        //     label: 'mentions',
+        //     data: total,
+        //     backgroundColor: 'rgba(255, 99, 132, 0)',
+        //     borderColor: 'rgba(63, 127, 191, 1)',
+        //     borderWidth: 2
+        // }
     ]
 
     return { cumulativeDatasets, datasets, labels}

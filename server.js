@@ -15,11 +15,11 @@ app.set('views', __dirname + '/views');
 
 const port = process.env.PORT || 3000
 
-app.get('/', async (req, res) => {
-  res.render('home')
-})
+// app.get('/', async (req, res) => {
+//   res.render('home')
+// })
 
-app.get('/hot', async (req, res) => {
+app.get('/', async (req, res) => {
   const date = req.query.date
   const timestamp = moment(date).utc().startOf('day').valueOf()
 
@@ -68,7 +68,7 @@ app.get('/hot', async (req, res) => {
       return function(num, render) {
           return parseFloat(render(num)).toFixed(2);
       }
-    }
+    },
   }
 
   res.render('hot', view)
@@ -84,11 +84,10 @@ app.get('/discussion', async (req, res) => {
   const date = moment().utc().startOf('day').valueOf()
   const snapshot = await db.collection('discussionCounts').doc(`${date}`).get()
   // res.send(formatDiscussion(snapshot.data()))
-  const topTickers = await getTopTickers(date, 7)
+  const topTickers = await getTopTickers(date, 5)
   const { datasets, cumulativeDatasets, labels } = formatDiscussion(snapshot.data(), topTickers)
 
   const view = {
-    ticker: 'TSLA',
     datasets: JSON.stringify(datasets),
     cumulativeDatasets: JSON.stringify(cumulativeDatasets),
     labels: JSON.stringify(labels),
