@@ -6,9 +6,8 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const formatDiscussion = (discussion, topTickers) => {
+const formatDiscussion = (discussion, topTickers, ticker) => {
     
-    const ticker = 'TSLA'
     const tickerData = {}
     Object.keys(topTickers).forEach(ticker => {
         tickerData[ticker] = [0]
@@ -67,7 +66,7 @@ const formatDiscussion = (discussion, topTickers) => {
     const datasets = [
         {
             spanGaps: true,
-            label: 'bull',
+            label: ticker + ' bull',
             data: bull,
             backgroundColor: 'rgba(61, 203, 101, 0.2)',
             borderColor: 'rgba(61, 203, 101, 1)',
@@ -75,7 +74,7 @@ const formatDiscussion = (discussion, topTickers) => {
         },
         {
             spanGaps: true,
-            label: 'bear',
+            label: ticker + ' bear',
             data: bear,
             backgroundColor: 'rgba(228, 67, 70, 0.2)',
             borderColor: 'rgba(61, 203, 101, 0)',
