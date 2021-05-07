@@ -30,7 +30,6 @@ const getDiscussionPosts = async () => {
     
     let comments = []
     await Promise.all(discussions.map(async dd => {
-        // console.log(`Getting ${cursor.offset} comments from post ${cursor.id}`)
         const post = await dd.expandReplies({ limit: 300, depth: 0 }).then(e => e)
 
         console.log(`Got ${post.comments.length} comments`)
@@ -41,7 +40,6 @@ const getDiscussionPosts = async () => {
             }
         })
 
-        // comments = [...comments, ...post.comments]
     }))
 
     console.log(`Kept ${comments.length} comments`)
@@ -55,7 +53,18 @@ const getDiscussionPosts = async () => {
     return counts
 }
 
+getPinnedPosts = async () => {
+    const posts = await r.getHot(SUBREDDIT, { limit: 0 } )
+    return posts.filter(post => post.stickied).map(post => {
+        return {
+            link: post.permalink,
+            title: post.title,
+        }
+    })
+}
+
 
 module.exports = {
-    getDiscussionPosts
+    getDiscussionPosts,
+    getPinnedPosts
 }

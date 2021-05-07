@@ -8,7 +8,6 @@ const {
 } = require('../firestore');
 
 const dd = async () => {
-    
     const date = moment().utc().startOf('day').valueOf()
     const now = moment().utc()
 
