@@ -81,12 +81,12 @@ app.get('/test', async (req, res) => {
 })
 
 app.get('/discussion', async (req, res) => {
-  const ticker = req.query.ticker
 
   const date = moment().utc().startOf('day').valueOf()
   const snapshot = await db.collection('discussionCounts').doc(`${date}`).get()
   // res.send(formatDiscussion(snapshot.data()))
   const topTickers = await getTopTickers(date, 5)
+  const ticker = req.query.ticker || Object.keys(topTickers)[0]
   const { datasets, cumulativeDatasets, labels } = formatDiscussion(snapshot.data(), topTickers, ticker)
 
   const view = {
