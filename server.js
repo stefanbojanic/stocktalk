@@ -59,13 +59,11 @@ app.get('/', async (req, res) => {
     return 0;
   })
 
-  const topTickers = tickers.slice(0, 10).map(ticker => ticker.ticker)
-  console.log(topTickers)
-  const tickerQuotes = await getTickerQuotes(topTickers)
-  console.log(tickerQuotes)
+  const keptTickers = tickers.slice(0, 25)
+  const tickerQuotes = await getTickerQuotes(keptTickers)
 
   const view = {
-    tickers,
+    tickers: tickerQuotes,
     date: moment(date).format('YYYY-MMM-D'),
     toFixed: function() {
       return function(num, render) {

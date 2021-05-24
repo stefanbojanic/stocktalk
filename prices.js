@@ -3,41 +3,32 @@ const {
 } = require('./constants')
 const httpRequest = require('./http');
 
-const getTickerQuotes = async (tickers) => {
+const getTickerQuotes = async (tickerObjs) => {
 
     const tickerMap = {}
 
-    await Promise.all(tickers.map(ticker => {
-        const params = {
-            hostname: 'cloud.iexapis.com', // use cloud.iexapis.com for real, sandbox.iexapis.com to test
-            port: 443,
-            method: 'GET',
-            path: '/stable/stock/' + ticker + '/quote?token=' + PROD_KEY // API_KEY or PROD_KEY
+    const tickers = tickerObjs.map(ticker => ticker.ticker)
+    console.log('/stable/stock/market/batch?symbols=' + tickers.join() + '&token=' + PROD_KEY)
+    const params = {
+        hostname: 'cloud.iexapis.com', // use cloud.iexapis.com for real, sandbox.iexapis.com to test
+        port: 443,
+        method: 'GET',
+        path: '/stable/stock/market/batch?symbols=' + tickers.join() + '&types=quote&token=' + PROD_KEY 
+    }
+
+    const quotes = await httpRequest(params)
+        .then(data => {
+            return data
+        })
+        .catch(err => console.log(err))
+
+    return tickerObjs.map(ticker => {
+        return {
+            ...ticker,
+            price: quotes[ticker.ticker].quote.delayedPrice,
+            change: quotes[ticker.ticker].quote.changePercent * 100,
         }
-    
-        return httpRequest(params)
-            .then((data) => {
-                if (data.delayedPrice && data.changePercent) {
-                    tickerMap[ticker] = {
-                        price: data.delayedPrice,
-                        changePercent: data.changePercent
-                    }
-                    return
-                } else {
-                    console.log('Ignored ticker', ticker)
-                    return
-                }
-            })
-            .catch((e) => {
-                    console.log('Error', e.statusCode, ticker)
-            })
-            .finally(() => {
-                return
-            })
-
-    }))
-
-    return tickerMap    
+    })
 
 }
 
