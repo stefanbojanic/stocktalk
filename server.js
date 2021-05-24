@@ -7,6 +7,7 @@ const { db } = require('./firestore');
 
 const { formatDiscussion } = require('./dataFormat')
 const { getDiscussionPosts, getPinnedPosts } = require('./reddit')
+const { getTickerQuotes } = require('./prices')
 
 const app = express()
 app.engine('mustache', mustacheExpress());
@@ -57,6 +58,11 @@ app.get('/', async (req, res) => {
     }
     return 0;
   })
+
+  const topTickers = tickers.slice(0, 10).map(ticker => ticker.ticker)
+  console.log(topTickers)
+  const tickerQuotes = await getTickerQuotes(topTickers)
+  console.log(tickerQuotes)
 
   const view = {
     tickers,
