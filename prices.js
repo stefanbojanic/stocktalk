@@ -24,11 +24,10 @@ const getTickerQuotes = async (tickerObjs) => {
         })
         .catch(err => console.log(err))
 
-    // console.log(quotes)
     return tickerObjs.map(ticker => {
         return {
             ...ticker,
-            price: quotes[ticker.ticker].quote.delayedPrice,
+            price: quotes[ticker.ticker].quote.delayedPrice || quotes[ticker.ticker].quote.latestPrice,
             change: quotes[ticker.ticker].quote.changePercent * 100,
         }
     })
