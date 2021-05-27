@@ -23,10 +23,11 @@ const port = process.env.PORT || 3000
 app.get('/', async (req, res) => {
   const date = req.query.date
   const timestamp = moment(date).utc().startOf('day').valueOf()
+  const isToday = timestamp === moment().utc().startOf('day').valueOf()
 
   let snapshot = await db.collection('counts').doc(`${timestamp}`).get()
 
-  if (!snapshot.exists && timestamp === moment().utc().startOf('day').valueOf()) {
+  if (!snapshot.exists && isToday) {
     // Trying to get todays data and its not there
     await getHot()
     snapshot = await db.collection('counts').doc(`${timestamp}`).get()
@@ -59,11 +60,17 @@ app.get('/', async (req, res) => {
     return 0;
   })
 
-  const keptTickers = tickers.slice(0, 25)
-  const tickerQuotes = await getTickerQuotes(keptTickers)
+  const keptTickers = tickers.slice(0, 15)
+  let tickerQuotes = keptTickers
+
+  if (isToday) {
+    console.log(isToday)
+    tickerQuotes = await getTickerQuotes(keptTickers)
+  }
 
   const view = {
     tickers: tickerQuotes,
+    includePrice: isToday,
     date: moment(date).format('YYYY-MMM-D'),
     toFixed: function() {
       return function(num, render) {
