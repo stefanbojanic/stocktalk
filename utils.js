@@ -11,7 +11,7 @@ const {
     updateList,
     saveLists
 } = require('./firestore');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const httpRequest = require('./http');
 const constants = require('./constants');
 
