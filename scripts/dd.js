@@ -1,4 +1,4 @@
-const moment = require('moment');
+const moment = require('moment-timezone');
 const { getDiscussionPosts } = require('../reddit');
 const { roundDate } = require('../utils');
 const {
@@ -8,8 +8,8 @@ const {
 } = require('../firestore');
 
 const dd = async () => {
-    const date = moment().utc().startOf('day').valueOf()
-    const now = moment().utc()
+    const date = moment().tz('US/Eastern').startOf('day').valueOf()
+    const now = moment().tz('US/Eastern')
 
     const topTickersRef = db.collection('discussionTopTickers').doc(`${date}`)
     const roundedDate = roundDate(now, moment.duration(10, 'minutes'), 'floor').valueOf()

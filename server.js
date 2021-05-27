@@ -22,8 +22,8 @@ const port = process.env.PORT || 3000
 
 app.get('/', async (req, res) => {
   const date = req.query.date
-  const timestamp = moment(date).utc().startOf('day').valueOf()
-  const isToday = timestamp === moment().utc().startOf('day').valueOf()
+  const timestamp = moment(date).tz('US/Eastern').startOf('day').valueOf()
+  const isToday = timestamp === moment().tz('US/Eastern').startOf('day').valueOf()
 
   let snapshot = await db.collection('counts').doc(`${timestamp}`).get()
 
@@ -31,7 +31,7 @@ app.get('/', async (req, res) => {
     // Trying to get todays data and its not there
     await getHot()
     snapshot = await db.collection('counts').doc(`${timestamp}`).get()
-  } else if (!snapshot.exists && timestamp !== moment().utc().startOf('day').valueOf()) {
+  } else if (!snapshot.exists && !isToday) {
     // Trying to get another days data and its not there
     res.send('No data for the selected timeframe')
     return
@@ -90,7 +90,7 @@ app.get('/test', async (req, res) => {
 
 app.get('/discussion', async (req, res) => {
 
-  const date = moment().utc().startOf('day').valueOf()
+  const date = moment().tz('US/Eastern').startOf('day').valueOf() 
   const snapshot = await db.collection('discussionCounts').doc(`${date}`).get()
   // res.send(formatDiscussion(snapshot.data()))
   const topTickers = await getTopTickers(date, 5)

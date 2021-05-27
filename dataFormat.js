@@ -1,4 +1,4 @@
-const moment = require('moment');
+const moment = require('moment-timezone');
 
 function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -37,7 +37,7 @@ const formatDiscussion = (discussion, topTickers, ticker) => {
         bear.push(null)
         mentions.push(null)
 
-        labels.push(moment.unix(date/1000).format('LT'))
+        labels.push(moment.unix(date/1000).tz('US/Eastern').format('LT'))
         
         Object.entries(discussion[date]).forEach(([k, v]) => {
             if (k === ticker) {
