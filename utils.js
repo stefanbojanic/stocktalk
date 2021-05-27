@@ -11,7 +11,7 @@ const {
     updateList,
     saveLists
 } = require('./firestore');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const httpRequest = require('./http');
 const constants = require('./constants');
 
@@ -157,7 +157,7 @@ const checkTicker = (allowList, denyList, word) => {
 }
 
 const getHot = async () => {
-    const date = moment().utc().startOf('day').valueOf()
+    const date = moment().tz('US/Eastern').startOf('day').valueOf()
 
     const initial = await r.getHot(SUBREDDIT, { limit: 100 } )
     const content = await initial.fetchMore({ amount: 30, append: true })
