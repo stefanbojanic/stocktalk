@@ -1,7 +1,9 @@
+const moment = require('moment-timezone');
 const {
-    PROD_KEY,
+    PROD_KEY, API_KEY
 } = require('./constants')
 const httpRequest = require('./http');
+const { roundDate } = require('./utils');
 
 const getTickerQuotes = async (tickerObjs) => {
 
@@ -33,6 +35,54 @@ const getTickerQuotes = async (tickerObjs) => {
 
 }
 
+const getTickerChartData = async (ticker, date) => {
+
+    const path = `/stable/stock/${ticker.toLowerCase()}/intraday-prices?token=${PROD_KEY}`
+
+    const params = {
+        hostname: 'cloud.iexapis.com', // use cloud.iexapis.com for real, sandbox.iexapis.com to test
+        method: 'GET',
+        path
+    }
+
+    const quotes = await httpRequest(params)
+        .then(data => {
+            return data
+        })
+        .catch(err => console.log(err))
+
+    const timeseries = []
+    let timeLast = ''
+    
+    quotes.forEach(quote => {
+        const time = moment(quote.label, 'LT').tz('US/Eastern')
+        const roundedDate = roundDate(time, moment.duration(10, 'minutes'), 'floor').valueOf()
+        if (timeLast !== roundedDate) {
+            timeseries.push(quote.open)
+            timeLast = roundedDate
+        }
+    })
+
+    const path2 = `/stable/stock/${ticker.toLowerCase()}/quote?token=${PROD_KEY}`
+    const params2 = {
+        hostname: 'cloud.iexapis.com', // use cloud.iexapis.com for real, sandbox.iexapis.com to test
+        method: 'GET',
+        path: path2
+    }
+
+    const quote = await httpRequest(params2)
+        .then(data => {
+            return data
+        })
+        .catch(err => console.log(err))
+
+    const direction = Math.sign(quote.change)
+
+    return { timeseries, direction }
+
+}
+
 module.exports = {
-    getTickerQuotes
+    getTickerQuotes,
+    getTickerChartData,
 }

@@ -58,9 +58,34 @@
         </ul>
 
         <canvas id="chart" width="200" height="100"></canvas>
+        <canvas id="priceChart" width="200" height="100"></canvas>
         <canvas id="cumulativeChart" width="200" height="100"></canvas>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+
+    <script>
+        var ctx = document.getElementById('priceChart');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{{labels}}},
+                datasets: {{{priceDataset}}}
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        id: 'price',
+                    }]
+                },
+                elements: {
+                    point:{
+                        radius: 0,
+                        hitRadius: 5
+                    }
+                }
+            }
+        });
+    </script>
 
     <script>
         var ctx = document.getElementById('chart');
