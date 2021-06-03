@@ -7,7 +7,7 @@ const { db } = require('./firestore');
 
 const { formatDiscussion } = require('./dataFormat')
 const { getDiscussionPosts, getPinnedPosts } = require('./reddit')
-const { getTickerQuotes } = require('./prices')
+const { getTickerQuotes, getTickerChartData} = require('./prices')
 
 const app = express()
 app.engine('mustache', mustacheExpress());
@@ -89,8 +89,8 @@ app.get('/test', async (req, res) => {
 })
 
 app.get('/discussion', async (req, res) => {
-
-  const date = moment().tz('US/Eastern').startOf('day').valueOf() 
+  const dateObj = moment().tz('US/Eastern').startOf('day')
+  const date = dateObj.valueOf() 
   const snapshot = await db.collection('discussionCounts').doc(`${date}`).get()
   // res.send(formatDiscussion(snapshot.data()))
   const topTickers = await getTopTickers(date, 5)
@@ -99,8 +99,27 @@ app.get('/discussion', async (req, res) => {
 
   const pinnedPosts = await getPinnedPosts()
 
+  const marketData = await getTickerChartData(ticker, dateObj.format('YYYYMMDD'))
+  const priceColor = marketData.direction ? 'rgba(61, 203, 101,' : 'rgba(228, 67, 70,'
+
+  const arr = []
+  arr.length = 50
+  
+  const prices = [...arr, ...marketData.timeseries]
+
+  const priceDataset = [{
+    label: `${ticker} price`,
+    yAxisID: 'price',
+    data: prices,
+    borderColor: `${priceColor} 1)`,
+    backgroundColor: `${priceColor} 0.2)`,
+    borderWidth: 2,
+  }]
+
   const view = {
     datasets: JSON.stringify(datasets),
+    priceDataset: JSON.stringify(priceDataset),
+    priceColor,
     cumulativeDatasets: JSON.stringify(cumulativeDatasets),
     labels: JSON.stringify(labels),
     tickers: Object.keys(topTickers),
