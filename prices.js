@@ -57,7 +57,7 @@ const getTickerChartData = async (ticker, date) => {
     quotes.forEach(quote => {
         const time = moment(quote.label, 'LT').tz('US/Eastern')
         const roundedDate = roundDate(time, moment.duration(10, 'minutes'), 'floor').valueOf()
-        if (timeLast !== roundedDate) {
+        if (timeLast !== roundedDate && quote.open) {
             timeseries.push(quote.open)
             timeLast = roundedDate
         }
